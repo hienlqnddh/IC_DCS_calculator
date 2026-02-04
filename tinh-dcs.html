@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tính Module DCS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="clock">...</div>
+    <div class="container">
+        <h1>CÔNG CỤ HỖ TRỢ TÍNH TOÁN-CHUYỂN ĐỔI THÔNG SỐ DCS</h1>
+        <h2>TÍNH TOÁN -CHUYỂN ĐỔI THÔNG SỐ CHO MODULE ANALOG DCS</h2>
+
+        <div class="input-group">
+            <h3>CN1: Tính hệ số a, b</h3>
+            <label>Điểm Zero:</label><input type="number" id="dcs1_zero">
+            <label>Điểm Span:</label><input type="number" id="dcs1_span">
+            <button onclick="calcDCS1()">Tính hệ số</button>
+            <div class="result" id="res_dcs1">Kết quả: ...</div>
+            <div class="tech-note">Cc1(a)=(Span-Zero)/0,016; Cc2(b)=Zero-0,004.a</div>
+        </div>
+
+        <div class="input-group">
+            <h3>CN2: Tính Span từ giá trị đo</h3>
+            <label>Điểm Zero:</label><input type="number" id="dcs2_zero">
+            <label>Dòng tín hiệu x (mA):</label><input type="number" id="dcs2_x">
+            <label>Giá trị hiển thị y:</label><input type="number" id="dcs2_y">
+            <button onclick="calcDCS2()">Tính Span</button>
+            <div class="result" id="res_dcs2">Kết quả: ...</div>
+            <div class="tech-note">Span =Zero + 16*((y- Zero)/(x-4))</div>
+        </div>
+
+        <div class="input-group">
+            <h3>CN3: Tính giá trị đo từ mA</h3>
+            <label>Điểm Zero:</label><input type="number" id="dcs3_zero">
+            <label>Điểm Span:</label><input type="number" id="dcs3_span">
+            <label>Dòng tín hiệu x (mA):</label><input type="number" id="dcs3_x">
+            <button onclick="calcDCS3()">Tính Giá trị</button>
+            <div class="result" id="res_dcs3">Kết quả: ...</div>
+            <div class="tech-note">Value= Zero + ((Span – Zero)/16)*(x-4)</div>
+        </div>
+
+        <a href="index.html" class="btn-link btn-back">Quay lại trang chính</a>
+    </div>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = "Thời gian thực: " + now.toLocaleString('vi-VN');
+        }
+        setInterval(updateClock, 1000); updateClock();
+
+        function calcDCS1() {
+            let z = parseFloat(document.getElementById('dcs1_zero').value);
+            let s = parseFloat(document.getElementById('dcs1_span').value);
+            if (isNaN(z) || isNaN(s)) return;
+            let a = (s - z) / 0.016;
+            let b = z - (0.004 * a);
+            document.getElementById('res_dcs1').innerHTML = `Cc1(a) = <b>${a.toFixed(4)}</b> <br> Cc2(b) = <b>${b.toFixed(4)}</b>`;
+        }
+
+        function calcDCS2() {
+            let z = parseFloat(document.getElementById('dcs2_zero').value);
+            let x = parseFloat(document.getElementById('dcs2_x').value);
+            let y = parseFloat(document.getElementById('dcs2_y').value);
+            if (x === 4) { alert("Dòng x phải khác 4"); return; }
+            let span = z + 16 * ((y - z) / (x - 4));
+            document.getElementById('res_dcs2').innerHTML = `Điểm đo có dãy từ <b>${z}</b> đến <b>${span.toFixed(2)}</b>`;
+        }
+
+        function calcDCS3() {
+            let z = parseFloat(document.getElementById('dcs3_zero').value);
+            let s = parseFloat(document.getElementById('dcs3_span').value);
+            let x = parseFloat(document.getElementById('dcs3_x').value);
+            let val = z + ((s - z) / 16) * (x - 4);
+            document.getElementById('res_dcs3').innerHTML = `Giá trị đo được là: <b>${val.toFixed(2)}</b>`;
+        }
+    </script>
+</body>
+</html>
