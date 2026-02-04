@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tính PLC Dòng</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="clock">...</div>
+    <div class="container">
+        <h1>CÔNG CỤ HỖ TRỢ TÍNH TOÁN-CHUYỂN ĐỔI THÔNG SỐ DCS</h1>
+        <h2>TÍNH TOÁN -CHUYỂN ĐỔI THÔNG SỐ CHO MODULE ANALOG PLC (Đo dòng)</h2>
+        <p style="text-align: center;">(Áp dụng cho PLC Siemens)</p>
+
+        <div class="input-group">
+            <h3>CN1: Tính Scale (Dạng 4-20mA)</h3>
+            <label>Zero / Span:</label>
+            <input type="number" id="plc_c1_zero" placeholder="Zero">
+            <input type="number" id="plc_c1_span" placeholder="Span" style="margin-top:5px;">
+            <label>Giá trị Raw (Thô):</label><input type="number" id="plc_c1_raw">
+            <button onclick="calcPLC_C1()">Quy đổi</button>
+            <div class="result" id="res_plc_c1">Kết quả: ...</div>
+            <div class="tech-note">Scale = ((Raw / 27648) * (Span - Zero)) + Zero</div>
+        </div>
+
+        <div class="input-group">
+            <h3>CN2: Tính Scale (Dạng 0-20mA)</h3>
+            <label>Zero / Span:</label>
+            <input type="number" id="plc_c2_zero" placeholder="Zero">
+            <input type="number" id="plc_c2_span" placeholder="Span" style="margin-top:5px;">
+            <label>Giá trị Raw (Thô):</label><input type="number" id="plc_c2_raw">
+            <button onclick="calcPLC_C2()">Quy đổi</button>
+            <div class="result" id="res_plc_c2">Kết quả: ...</div>
+            <div class="tech-note">Scale = ((Raw / 27648) * (Span - Zero)) + Zero</div>
+        </div>
+
+        <div class="input-group">
+            <h3>CN3: Tính Raw từ Scale (Dạng 4-20mA)</h3>
+            <label>Zero / Span:</label>
+            <input type="number" id="plc_c3_zero" placeholder="Zero">
+            <input type="number" id="plc_c3_span" placeholder="Span" style="margin-top:5px;">
+            <label>Giá trị Scaling:</label><input type="number" id="plc_c3_val">
+            <button onclick="calcPLC_C3()">Quy đổi Raw</button>
+            <div class="result" id="res_plc_c3">Kết quả: ...</div>
+            <div class="tech-note">Raw = ((Value - Zero) / (Span - Zero)) * 27648 (Dãy raw: 0-27648)</div>
+        </div>
+
+        <div class="input-group">
+            <h3>CN4: Tính Raw từ Scale (Dạng 0-20mA)</h3>
+            <label>Zero / Span:</label>
+            <input type="number" id="plc_c4_zero" placeholder="Zero">
+            <input type="number" id="plc_c4_span" placeholder="Span" style="margin-top:5px;">
+            <label>Giá trị Scaling:</label><input type="number" id="plc_c4_val">
+            <button onclick="calcPLC_C4()">Quy đổi Raw</button>
+            <div class="result" id="res_plc_c4">Kết quả: ...</div>
+            <div class="tech-note">Raw = ((Value - Zero) / (Span - Zero)) * 27648 (Dãy raw: 0-27648)</div>
+        </div>
+
+        <a href="index.html" class="btn-link btn-back">Quay lại trang chính</a>
+    </div>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = "Thời gian thực: " + now.toLocaleString('vi-VN');
+        }
+        setInterval(updateClock, 1000); updateClock();
+
+        function plcScale(raw, z, s) { return ((raw / 27648) * (s - z)) + z; }
+        function plcRaw(val, z, s) { return ((val - z) / (s - z)) * 27648; }
+
+        function calcPLC_C1() {
+            let z = parseFloat(document.getElementById('plc_c1_zero').value);
+            let s = parseFloat(document.getElementById('plc_c1_span').value);
+            let r = parseFloat(document.getElementById('plc_c1_raw').value);
+            document.getElementById('res_plc_c1').innerText = `Scaling: ${plcScale(r, z, s).toFixed(2)}`;
+        }
+        function calcPLC_C2() {
+            let z = parseFloat(document.getElementById('plc_c2_zero').value);
+            let s = parseFloat(document.getElementById('plc_c2_span').value);
+            let r = parseFloat(document.getElementById('plc_c2_raw').value);
+            document.getElementById('res_plc_c2').innerText = `Scaling: ${plcScale(r, z, s).toFixed(2)}`;
+        }
+        function calcPLC_C3() {
+            let z = parseFloat(document.getElementById('plc_c3_zero').value);
+            let s = parseFloat(document.getElementById('plc_c3_span').value);
+            let v = parseFloat(document.getElementById('plc_c3_val').value);
+            document.getElementById('res_plc_c3').innerText = `Raw: ${Math.round(plcRaw(v, z, s))}`;
+        }
+        function calcPLC_C4() {
+            let z = parseFloat(document.getElementById('plc_c4_zero').value);
+            let s = parseFloat(document.getElementById('plc_c4_span').value);
+            let v = parseFloat(document.getElementById('plc_c4_val').value);
+            document.getElementById('res_plc_c4').innerText = `Raw: ${Math.round(plcRaw(v, z, s))}`;
+        }
+    </script>
+</body>
+</html>
