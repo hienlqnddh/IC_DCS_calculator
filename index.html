@@ -1,254 +1,459 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>CÔNG CỤ HỖ TRỢ TÍNH TOÁN DCS</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Công Cụ DCS</title>
+    <style>
+        /* PHẦN ĐỊNH DẠNG GIAO DIỆN (CSS) */
+        
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
 
-  <!-- ================= CSS: ĐỊNH DẠNG GIAO DIỆN ================= -->
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-    }
+        /* Định dạng tiêu đề chính: Xanh, Đậm, Giữa, Cỡ 20 */
+        h1 {
+            color: blue;
+            font-weight: bold;
+            text-align: center;
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
 
-    /* Tiêu đề chính */
-    .title {
-      font-weight: bold;
-      color: blue;
-      text-align: center;
-      font-size: 20px;
-    }
+        /* Định dạng tiêu đề phụ: Xanh, Đậm, Giữa, Cỡ 18 */
+        h2 {
+            color: blue;
+            font-weight: bold;
+            text-align: center;
+            font-size: 18px;
+            margin-top: 10px;
+        }
 
-    /* Tiêu đề phụ */
-    .subtitle {
-      font-weight: bold;
-      color: blue;
-      text-align: center;
-      font-size: 18px;
-      margin-top: 10px;
-    }
+        /* Định dạng đồng hồ: Phía bên phải */
+        #clock {
+            text-align: right;
+            font-style: italic;
+            color: #555;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
 
-    /* Thời gian thực */
-    .time {
-      text-align: right;
-      font-size: 14px;
-      margin-bottom: 10px;
-    }
+        /* Khung chứa các trang */
+        .page {
+            display: none; /* Mặc định ẩn tất cả các trang */
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
 
-    /* Ẩn / hiện trang */
-    .page {
-      display: none;
-    }
+        /* Trang active sẽ được hiện lên */
+        .page.active {
+            display: block;
+        }
 
-    /* Nút chức năng */
-    button {
-      margin: 5px;
-      padding: 8px 12px;
-    }
+        /* Định dạng nút bấm */
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        /* Nút quay lại trang chính */
+        .btn-back {
+            background-color: #6c757d;
+            margin-top: 20px;
+            width: 100%;
+        }
 
-    input {
-      margin: 3px;
-      width: 120px;
-    }
+        /* Các ô nhập liệu */
+        .input-group {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box; /* Để padding không làm vỡ khung */
+        }
+        
+        /* Phần hiển thị kết quả */
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #e9ecef;
+            color: #d63384; /* Màu chữ kết quả cho nổi bật */
+            font-weight: bold;
+        }
 
-    .box {
-      border: 1px solid #ccc;
-      padding: 10px;
-      margin-top: 10px;
-    }
-
-    .note {
-      font-size: 13px;
-      color: #444;
-      margin-top: 5px;
-    }
-  </style>
+        /* Phần chú thích kỹ thuật */
+        .tech-note {
+            font-size: 12px;
+            color: #666;
+            font-style: italic;
+            margin-top: 5px;
+            border-top: 1px dashed #ccc;
+            padding-top: 5px;
+        }
+    </style>
 </head>
 <body>
 
-<!-- ================= HEADER CHUNG CHO MỌI GIAO DIỆN ================= -->
-<div class="title">CÔNG CỤ HỖ TRỢ TÍNH TOÁN-CHUYỂN ĐỔI THÔNG SỐ DCS</div>
-<div id="time" class="time"></div>
+    <div id="clock">Đang tải thời gian...</div>
 
-<!-- ================= TRANG 1: TRANG CHÍNH ================= -->
-<div id="home" class="page" style="display:block">
-  <div class="box">
-    <button onclick="showPage('temp')">Tính toán nhiệt độ</button>
-    <button onclick="showPage('dcs')">Tính thông số module Analog DCS</button>
-    <button onclick="showPage('plc_i')">PLC Analog đo dòng</button>
-    <button onclick="showPage('plc_v')">PLC Analog đo áp</button>
-  </div>
-</div>
-
-<!-- ================= TRANG 2: NHIỆT ĐỘ ================= -->
-<div id="temp" class="page">
-  <div class="subtitle">TÍNH TOÁN CHUYỂN ĐỔI NHIỆT ĐỘ CỦA PT100, TC LOẠI K</div>
-
-  <div class="box">
-    <b>RTD PT100 – 3 dây</b><br>
-    Rab (Ω): <input id="rab">  Rbc (Ω): <input id="rbc">
-    <button onclick="calcPT100()">Tính</button>
-    <div id="pt100_rs"></div>
-    <div class="note">
-      Công thức gần đúng: R = Rab − Rbc;  T = (R − 100) / 0.385
+    <div id="page-main" class="page active">
+        <h1>CÔNG CỤ HỖ TRỢ TÍNH TOÁN-CHUYỂN ĐỔI THÔNG SỐ DCS</h1>
+        <hr>
+        <div style="text-align: center;">
+            <p>Chọn chức năng tính toán:</p>
+            <button onclick="showPage('page-temp')">Tính toán nhiệt độ</button><br>
+            <button onclick="showPage('page-dcs')">Tính thông số module Analog DCS</button><br>
+            <button onclick="showPage('page-plc-current')">Tính module Analog PLC (Đo dòng)</button><br>
+            <button onclick="showPage('page-plc-voltage')">Tính module Analog PLC (Đo áp)</button>
+        </div>
     </div>
-  </div>
 
-  <div class="box">
-    <b>Thermocouple loại K (có bù nhiệt độ môi trường)</b><br>
-    Điện áp (mV): <input id="mv">  Nhiệt độ môi trường (°C): <input id="amb">
-    <button onclick="calcTC()">Tính</button>
-    <div id="tc_rs"></div>
-    <div class="note">
-      Công thức giản lược: T ≈ (mV × 25) + T_môi_trường
+    <div id="page-temp" class="page">
+        <h1>CÔNG CỤ HỖ TRỢ TÍNH TOÁN-CHUYỂN ĐỔI THÔNG SỐ DCS</h1>
+        <h2>TÍNH TOÁN CHUYỂN ĐỔI NHIỆT ĐỘ CỦA PT100, TC LOẠI K</h2>
+        
+        <div class="input-group">
+            <h3>1. Chuyển đổi nhiệt độ RTD PT100 (3 dây)</h3>
+            <label>Nhập Rab (Điện trở RTD + Dây) (Ohm):</label>
+            <input type="number" id="pt100_Rab" placeholder="Ví dụ: 108">
+            <label>Nhập Rbc (Điện trở dây bù) (Ohm):</label>
+            <input type="number" id="pt100_Rbc" placeholder="Ví dụ: 0.5">
+            <button onclick="calcPT100()">Tính Nhiệt Độ</button>
+            <div class="result" id="res_pt100">Kết quả: ...</div>
+            <div class="tech-note">
+                <strong>Chú thích kỹ thuật:</strong><br>
+                - Công thức điện trở thực tế: R_sensor = Rab - 2*Rbc.<br>
+                - Công thức tính nhiệt độ (gần đúng tuyến tính): T = (R_sensor - 100) / 0.385.<br>
+                - Chuẩn DIN 43760: Tại 0°C R=100Ω, hệ số alpha = 0.00385.
+            </div>
+        </div>
+
+        <div class="input-group">
+            <h3>2. Chuyển đổi TC loại K (Bù nhiệt môi trường)</h3>
+            <label>Nhập Điện áp đo được (mV):</label>
+            <input type="number" id="tc_mV" placeholder="Ví dụ: 4.096">
+            <label>Nhập Nhiệt độ môi trường (°C):</label>
+            <input type="number" id="tc_amb" placeholder="Ví dụ: 25">
+            <button onclick="calcTCK()">Tính Nhiệt Độ</button>
+            <div class="result" id="res_tck">Kết quả: ...</div>
+            <div class="tech-note">
+                <strong>Chú thích kỹ thuật:</strong><br>
+                - Nguyên lý bù lạnh: V_total = V_đo + V_môi_trường.<br>
+                - Tính V_môi_trường: xấp xỉ Amb_Temp * 0.041 mV/°C.<br>
+                - Tính Nhiệt độ lò: V_total / 0.041 (Hệ số Seebeck trung bình cho loại K là 41µV/°C).
+            </div>
+        </div>
+
+        <button class="btn-back" onclick="showPage('page-main')">Quay lại trang chính</button>
     </div>
-  </div>
 
-  <button onclick="showPage('home')">Quay lại trang chính</button>
-</div>
+    <div id="page-dcs" class="page">
+        <h1>CÔNG CỤ HỖ TRỢ TÍNH TOÁN-CHUYỂN ĐỔI THÔNG SỐ DCS</h1>
+        <h2>TÍNH TOÁN -CHUYỂN ĐỔI THÔNG SỐ CHO MODULE ANALOG DCS</h2>
 
-<!-- ================= TRANG 3: MODULE ANALOG DCS ================= -->
-<div id="dcs" class="page">
-  <div class="subtitle">TÍNH TOÁN - CHUYỂN ĐỔI THÔNG SỐ MODULE ANALOG DCS</div>
+        <div class="input-group">
+            <h3>CN1: Tính hệ số a, b</h3>
+            <label>Điểm Zero:</label><input type="number" id="dcs1_zero">
+            <label>Điểm Span:</label><input type="number" id="dcs1_span">
+            <button onclick="calcDCS1()">Tính hệ số</button>
+            <div class="result" id="res_dcs1">Kết quả: ...</div>
+        </div>
 
-  <div class="box">
-    <b>Chức năng 1: Tính hệ số tuyến tính a, b</b><br>
-    Zero: <input id="z1">  Span: <input id="s1">
-    <button onclick="calcAB()">Tính</button>
-    <div id="ab_rs"></div>
-    <div class="note">
-      a = (Span − Zero) / 0.016<br>
-      b = Zero − 0.004 × a
+        <div class="input-group">
+            <h3>CN2: Tính Span từ giá trị đo thực tế</h3>
+            <label>Điểm Zero:</label><input type="number" id="dcs2_zero">
+            <label>Dòng tín hiệu x (mA):</label><input type="number" id="dcs2_x">
+            <label>Giá trị hiển thị y:</label><input type="number" id="dcs2_y">
+            <button onclick="calcDCS2()">Tính Span</button>
+            <div class="result" id="res_dcs2">Kết quả: ...</div>
+            <div class="tech-note">CT: Span = Zero + 16 * ((y - Zero) / (x - 4))</div>
+        </div>
+
+        <div class="input-group">
+            <h3>CN3: Tính giá trị đo từ dòng mA</h3>
+            <label>Điểm Zero:</label><input type="number" id="dcs3_zero">
+            <label>Điểm Span:</label><input type="number" id="dcs3_span">
+            <label>Dòng tín hiệu x (mA):</label><input type="number" id="dcs3_x">
+            <button onclick="calcDCS3()">Tính Giá trị</button>
+            <div class="result" id="res_dcs3">Kết quả: ...</div>
+            <div class="tech-note">CT: Value = Zero + ((Span – Zero)/16) * (x-4)</div>
+        </div>
+
+        <button class="btn-back" onclick="showPage('page-main')">Quay lại trang chính</button>
     </div>
-  </div>
 
-  <div class="box">
-    <b>Chức năng 2: Tính Span từ giá trị đo hiện tại</b><br>
-    Zero: <input id="z2">  Dòng x (mA): <input id="x2">  Giá trị y: <input id="y2">
-    <button onclick="calcSpan()">Tính</button>
-    <div id="span_rs"></div>
-    <div class="note">
-      Span = Zero + 16 × ((y − Zero) / (x − 4))
+    <div id="page-plc-current" class="page">
+        <h1>CÔNG CỤ HỖ TRỢ TÍNH TOÁN-CHUYỂN ĐỔI THÔNG SỐ DCS</h1>
+        <h2>TÍNH TOÁN -CHUYỂN ĐỔI THÔNG SỐ CHO MODULE ANALOG PLC (ĐO DÒNG)</h2>
+        <p style="text-align: center;">(Áp dụng cho PLC Siemens)</p>
+
+        <div class="input-group">
+            <h3>CN1: Tính Scale (Dạng 4-20mA)</h3>
+            <label>Zero:</label><input type="number" id="plc_c1_zero">
+            <label>Span:</label><input type="number" id="plc_c1_span">
+            <label>Giá trị Raw (Thô):</label><input type="number" id="plc_c1_raw">
+            <button onclick="calcPLC_C1()">Quy đổi</button>
+            <div class="result" id="res_plc_c1">Kết quả: ...</div>
+            <div class="tech-note">
+                Công thức: Scale = ((Raw / 27648) * (Span - Zero)) + Zero.<br>
+                Lưu ý: Với Siemens, 4-20mA tương ứng Raw 0 - 27648.
+            </div>
+        </div>
+
+        <div class="input-group">
+            <h3>CN2: Tính Scale (Dạng 0-20mA)</h3>
+            <label>Zero:</label><input type="number" id="plc_c2_zero">
+            <label>Span:</label><input type="number" id="plc_c2_span">
+            <label>Giá trị Raw (Thô):</label><input type="number" id="plc_c2_raw">
+            <button onclick="calcPLC_C2()">Quy đổi</button>
+            <div class="result" id="res_plc_c2">Kết quả: ...</div>
+            <div class="tech-note">
+                Công thức: Scale = ((Raw / 27648) * (Span - Zero)) + Zero.<br>
+                Lưu ý: Với Siemens, 0-20mA cũng tương ứng Raw 0 - 27648.
+            </div>
+        </div>
+
+        <div class="input-group">
+            <h3>CN3: Tính Raw từ Scale (Dạng 4-20mA)</h3>
+            <label>Zero:</label><input type="number" id="plc_c3_zero">
+            <label>Span:</label><input type="number" id="plc_c3_span">
+            <label>Giá trị Scaling:</label><input type="number" id="plc_c3_val">
+            <button onclick="calcPLC_C3()">Quy đổi Raw</button>
+            <div class="result" id="res_plc_c3">Kết quả: ...</div>
+            <div class="tech-note">
+                Công thức: Raw = ((Value - Zero) / (Span - Zero)) * 27648.<br>
+                Dãy giá trị Raw của module Siemens là từ 0 đến 27648.
+            </div>
+        </div>
+        
+        <div class="input-group">
+            <h3>CN4: Tính Raw từ Scale (Dạng 0-20mA)</h3>
+            <label>Zero:</label><input type="number" id="plc_c4_zero">
+            <label>Span:</label><input type="number" id="plc_c4_span">
+            <label>Giá trị Scaling:</label><input type="number" id="plc_c4_val">
+            <button onclick="calcPLC_C4()">Quy đổi Raw</button>
+            <div class="result" id="res_plc_c4">Kết quả: ...</div>
+            <div class="tech-note">
+                Công thức: Raw = ((Value - Zero) / (Span - Zero)) * 27648.<br>
+                Dãy giá trị Raw của module Siemens là từ 0 đến 27648.
+            </div>
+        </div>
+
+        <button class="btn-back" onclick="showPage('page-main')">Quay lại trang chính</button>
     </div>
-  </div>
 
-  <div class="box">
-    <b>Chức năng 3: Tính giá trị đo từ dòng mA</b><br>
-    Zero: <input id="z3">  Span: <input id="s3">  Dòng x (mA): <input id="x3">
-    <button onclick="calcValue()">Tính</button>
-    <div id="value_rs"></div>
-    <div class="note">
-      Value = Zero + ((Span − Zero) / 16) × (x − 4)
+    <div id="page-plc-voltage" class="page">
+        <h1>CÔNG CỤ HỖ TRỢ TÍNH TOÁN-CHUYỂN ĐỔI THÔNG SỐ DCS</h1>
+        <h2>TÍNH TOÁN -CHUYỂN ĐỔI THÔNG SỐ CHO MODULE ANALOG PLC (ĐO ÁP)</h2>
+        <p style="text-align: center;">(Áp dụng cho PLC Siemens)</p>
+
+        <div class="input-group">
+            <h3>CN1: Tính Scale (Dạng 0-10V)</h3>
+            <label>Zero:</label><input type="number" id="plc_v1_zero">
+            <label>Span:</label><input type="number" id="plc_v1_span">
+            <label>Giá trị Raw (Thô):</label><input type="number" id="plc_v1_raw">
+            <button onclick="calcPLC_V1()">Quy đổi</button>
+            <div class="result" id="res_plc_v1">Kết quả: ...</div>
+            <div class="tech-note">
+                Công thức: Scale = ((Raw / 27648) * (Span - Zero)) + Zero.<br>
+                Raw range cho 0-10V Siemens: 0 đến 27648.
+            </div>
+        </div>
+
+        <div class="input-group">
+            <h3>CN2: Tính Raw từ Scale (Dạng 0-10V)</h3>
+            <label>Zero:</label><input type="number" id="plc_v2_zero">
+            <label>Span:</label><input type="number" id="plc_v2_span">
+            <label>Giá trị Scaling:</label><input type="number" id="plc_v2_val">
+            <button onclick="calcPLC_V2()">Quy đổi Raw</button>
+            <div class="result" id="res_plc_v2">Kết quả: ...</div>
+            <div class="tech-note">
+                Công thức: Raw = ((Value - Zero) / (Span - Zero)) * 27648.<br>
+                Dãy giá trị Raw của module là từ 0 đến 27648.
+            </div>
+        </div>
+
+        <button class="btn-back" onclick="showPage('page-main')">Quay lại trang chính</button>
     </div>
-  </div>
 
-  <button onclick="showPage('home')">Quay lại trang chính</button>
-</div>
+    <script>
+        // --- 1. HÀM ĐỒNG HỒ ---
+        function updateClock() {
+            const now = new Date();
+            // Định dạng ngày giờ Việt Nam
+            const timeString = now.toLocaleString('vi-VN', { 
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', 
+                hour: '2-digit', minute: '2-digit', second: '2-digit' 
+            });
+            document.getElementById('clock').innerText = "Thời gian thực: " + timeString;
+        }
+        setInterval(updateClock, 1000); // Cập nhật mỗi giây
+        updateClock(); // Chạy ngay khi tải trang
 
-<!-- ================= TRANG 4: PLC ĐO DÒNG ================= -->
-<div id="plc_i" class="page">
-  <div class="subtitle">MODULE ANALOG PLC SIEMENS (ĐO DÒNG)</div>
+        // --- 2. HÀM CHUYỂN TRANG ---
+        function showPage(pageId) {
+            // Ẩn tất cả các trang
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+            // Hiện trang được chọn
+            document.getElementById(pageId).classList.add('active');
+            // Cuộn lên đầu trang
+            window.scrollTo(0, 0);
+        }
 
-  <div class="box">
-    Zero: <input id="zi">  Span: <input id="si">  Raw: <input id="rawi">
-    <button onclick="calcPLC_I()">Tính Scaling</button>
-    <div id="plc_i_rs"></div>
-    <div class="note">
-      Dãy Raw Siemens: 0 → 27648 (0–20mA) hoặc 5530 → 27648 (4–20mA)
-    </div>
-  </div>
+        // --- 3. CÁC HÀM TÍNH TOÁN ---
 
-  <button onclick="showPage('home')">Quay lại trang chính</button>
-</div>
+        // >>> TRANG 2: NHIỆT ĐỘ <<<
+        function calcPT100() {
+            let Rab = parseFloat(document.getElementById('pt100_Rab').value);
+            let Rbc = parseFloat(document.getElementById('pt100_Rbc').value);
+            
+            if (isNaN(Rab) || isNaN(Rbc)) { alert("Vui lòng nhập đủ số liệu"); return; }
 
-<!-- ================= TRANG 5: PLC ĐO ÁP ================= -->
-<div id="plc_v" class="page">
-  <div class="subtitle">MODULE ANALOG PLC SIEMENS (ĐO ÁP)</div>
+            // R thực = Rab - 2*Rbc
+            let R_sensor = Rab - (2 * Rbc);
+            // T = (R - 100) / 0.385 (Công thức tuyến tính hóa)
+            let Temp = (R_sensor - 100) / 0.385;
 
-  <div class="box">
-    Zero: <input id="zv">  Span: <input id="sv">  Raw: <input id="rawv">
-    <button onclick="calcPLC_V()">Tính Scaling</button>
-    <div id="plc_v_rs"></div>
-    <div class="note">
-      Dãy Raw Siemens 0–10V: 0 → 27648
-    </div>
-  </div>
+            document.getElementById('res_pt100').innerText = 
+                `Điện trở cảm biến: ${R_sensor.toFixed(3)} Ω => Nhiệt độ: ${Temp.toFixed(2)} °C`;
+        }
 
-  <button onclick="showPage('home')">Quay lại trang chính</button>
-</div>
+        function calcTCK() {
+            let mV = parseFloat(document.getElementById('tc_mV').value);
+            let amb = parseFloat(document.getElementById('tc_amb').value);
 
-<!-- ================= JAVASCRIPT: XỬ LÝ TÍNH TOÁN ================= -->
-<script>
-  // Thời gian thực
-  setInterval(() => {
-    document.getElementById('time').innerText = new Date().toLocaleString();
-  }, 1000);
+            if (isNaN(mV) || isNaN(amb)) { alert("Vui lòng nhập đủ số liệu"); return; }
 
-  // Điều hướng trang
-  function showPage(id) {
-    document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
-    document.getElementById(id).style.display = 'block';
-  }
+            // Giả sử hệ số K trung bình = 0.041 mV/°C
+            let V_amb = amb * 0.041; 
+            let V_total = mV + V_amb;
+            let Temp = V_total / 0.041;
 
-  // PT100 3 dây
-  function calcPT100() {
-    let Rab = parseFloat(rab.value);
-    let Rbc = parseFloat(rbc.value);
-    let R = Rab - Rbc;
-    let T = (R - 100) / 0.385;
-    pt100_rs.innerText = "Nhiệt độ ≈ " + T.toFixed(2) + " °C";
-  }
+            document.getElementById('res_tck').innerText = 
+                `Áp tổng (đã bù): ${V_total.toFixed(3)} mV => Nhiệt độ lò: ${Temp.toFixed(2)} °C`;
+        }
 
-  // TC loại K (giản lược)
-  function calcTC() {
-    let T = parseFloat(mv.value) * 25 + parseFloat(amb.value);
-    tc_rs.innerText = "Nhiệt độ ≈ " + T.toFixed(2) + " °C";
-  }
+        // >>> TRANG 3: DCS ANALOG <<<
+        function calcDCS1() {
+            let z = parseFloat(document.getElementById('dcs1_zero').value);
+            let s = parseFloat(document.getElementById('dcs1_span').value);
+            if (isNaN(z) || isNaN(s)) return;
 
-  // DCS a, b
-  function calcAB() {
-    let z = parseFloat(z1.value);
-    let s = parseFloat(s1.value);
-    let a = (s - z) / 0.016;
-    let b = z - 0.004 * a;
-    ab_rs.innerText = "a = " + a.toFixed(3) + " ; b = " + b.toFixed(3);
-  }
+            // a = (Span-Zero)/0.016
+            let a = (s - z) / 0.016;
+            // b = Zero - 0.004 * a
+            let b = z - (0.004 * a);
 
-  // Tính Span
-  function calcSpan() {
-    let z = parseFloat(z2.value);
-    let x = parseFloat(x2.value);
-    let y = parseFloat(y2.value);
-    let span = z + 16 * ((y - z) / (x - 4));
-    span_rs.innerText = "Span = " + span.toFixed(3);
-  }
+            document.getElementById('res_dcs1').innerHTML = 
+                `Cc1(a) = <b>${a.toFixed(4)}</b> <br> Cc2(b) = <b>${b.toFixed(4)}</b>`;
+        }
 
-  // Tính Value
-  function calcValue() {
-    let z = parseFloat(z3.value);
-    let s = parseFloat(s3.value);
-    let x = parseFloat(x3.value);
-    let value = z + ((s - z) / 16) * (x - 4);
-    value_rs.innerText = "Giá trị đo = " + value.toFixed(3);
-  }
+        function calcDCS2() {
+            let z = parseFloat(document.getElementById('dcs2_zero').value);
+            let x = parseFloat(document.getElementById('dcs2_x').value); // mA
+            let y = parseFloat(document.getElementById('dcs2_y').value); // Giá trị đo
+            
+            if (x === 4) { alert("Dòng x phải khác 4 để tránh chia cho 0"); return; }
+            
+            // Span = Zero + 16*((y- Zero)/(x-4))
+            let span = z + 16 * ((y - z) / (x - 4));
+            
+            document.getElementById('res_dcs2').innerHTML = 
+                `Điểm đo có dãy từ <b>${z}</b> đến <b>${span.toFixed(2)}</b>`;
+        }
 
-  // PLC đo dòng
-  function calcPLC_I() {
-    let z = parseFloat(zi.value);
-    let s = parseFloat(si.value);
-    let raw = parseFloat(rawi.value);
-    let value = z + (s - z) * raw / 27648;
-    plc_i_rs.innerText = "Giá trị Scaling = " + value.toFixed(3);
-  }
+        function calcDCS3() {
+            let z = parseFloat(document.getElementById('dcs3_zero').value);
+            let s = parseFloat(document.getElementById('dcs3_span').value);
+            let x = parseFloat(document.getElementById('dcs3_x').value); // mA
 
-  // PLC đo áp
-  function calcPLC_V() {
-    let z = parseFloat(zv.value);
-    let s = parseFloat(sv.value);
-    let raw = parseFloat(rawv.value);
-    let value = z + (s - z) * raw / 27648;
-    plc_v_rs.innerText = "Giá trị Scaling = " + value.toFixed(3);
-  }
-</script>
+            // Value = Zero + ((Span – Zero)/16)*(x-4)
+            let val = z + ((s - z) / 16) * (x - 4);
+            
+            document.getElementById('res_dcs3').innerHTML = 
+                `Giá trị tương đương ${x} mA là: <b>${val.toFixed(2)}</b>`;
+        }
+
+        // >>> TRANG 4: PLC DÒNG (SIEMENS 0-27648) <<<
+        // Hàm chung tính Scale từ Raw
+        function plcScale(raw, zero, span) {
+            // Siemens: 0-27648 (cho cả 4-20mA và 0-20mA khi đã vào module)
+            return ((raw / 27648) * (span - zero)) + zero;
+        }
+        // Hàm chung tính Raw từ Scale
+        function plcRaw(val, zero, span) {
+            return ((val - zero) / (span - zero)) * 27648;
+        }
+
+        function calcPLC_C1() { // 4-20mA Raw -> Scale
+            let z = parseFloat(document.getElementById('plc_c1_zero').value);
+            let s = parseFloat(document.getElementById('plc_c1_span').value);
+            let r = parseFloat(document.getElementById('plc_c1_raw').value);
+            let res = plcScale(r, z, s);
+            document.getElementById('res_plc_c1').innerText = `Giá trị Scaling: ${res.toFixed(2)}`;
+        }
+        function calcPLC_C2() { // 0-20mA Raw -> Scale (Công thức tương tự với Siemens chuẩn)
+            let z = parseFloat(document.getElementById('plc_c2_zero').value);
+            let s = parseFloat(document.getElementById('plc_c2_span').value);
+            let r = parseFloat(document.getElementById('plc_c2_raw').value);
+            let res = plcScale(r, z, s);
+            document.getElementById('res_plc_c2').innerText = `Giá trị Scaling: ${res.toFixed(2)}`;
+        }
+        function calcPLC_C3() { // 4-20mA Scale -> Raw
+            let z = parseFloat(document.getElementById('plc_c3_zero').value);
+            let s = parseFloat(document.getElementById('plc_c3_span').value);
+            let v = parseFloat(document.getElementById('plc_c3_val').value);
+            let res = plcRaw(v, z, s);
+            document.getElementById('res_plc_c3').innerText = `Giá trị Raw (Thô): ${Math.round(res)}`;
+        }
+        function calcPLC_C4() { // 0-20mA Scale -> Raw
+            let z = parseFloat(document.getElementById('plc_c4_zero').value);
+            let s = parseFloat(document.getElementById('plc_c4_span').value);
+            let v = parseFloat(document.getElementById('plc_c4_val').value);
+            let res = plcRaw(v, z, s);
+            document.getElementById('res_plc_c4').innerText = `Giá trị Raw (Thô): ${Math.round(res)}`;
+        }
+
+        // >>> TRANG 5: PLC ÁP (0-10V) <<<
+        function calcPLC_V1() { // 0-10V Raw -> Scale
+            let z = parseFloat(document.getElementById('plc_v1_zero').value);
+            let s = parseFloat(document.getElementById('plc_v1_span').value);
+            let r = parseFloat(document.getElementById('plc_v1_raw').value);
+            let res = plcScale(r, z, s);
+            document.getElementById('res_plc_v1').innerText = `Giá trị Scaling: ${res.toFixed(2)}`;
+        }
+        function calcPLC_V2() { // 0-10V Scale -> Raw
+            let z = parseFloat(document.getElementById('plc_v2_zero').value);
+            let s = parseFloat(document.getElementById('plc_v2_span').value);
+            let v = parseFloat(document.getElementById('plc_v2_val').value);
+            let res = plcRaw(v, z, s);
+            document.getElementById('res_plc_v2').innerText = `Giá trị Raw (Thô): ${Math.round(res)}`;
+        }
+    </script>
 </body>
 </html>
