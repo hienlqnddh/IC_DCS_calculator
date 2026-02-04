@@ -3,131 +3,252 @@
 <head>
   <meta charset="UTF-8">
   <title>CÔNG CỤ HỖ TRỢ TÍNH TOÁN DCS</title>
+
+  <!-- ================= CSS: ĐỊNH DẠNG GIAO DIỆN ================= -->
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    h1 { color: blue; text-align: center; font-size: 20px; }
-    h2 { color: blue; text-align: center; font-size: 18px; }
-    .time { text-align: right; font-size: 14px; }
-    .menu button { margin: 5px; padding: 10px; }
-    .page { display: none; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    /* Tiêu đề chính */
+    .title {
+      font-weight: bold;
+      color: blue;
+      text-align: center;
+      font-size: 20px;
+    }
+
+    /* Tiêu đề phụ */
+    .subtitle {
+      font-weight: bold;
+      color: blue;
+      text-align: center;
+      font-size: 18px;
+      margin-top: 10px;
+    }
+
+    /* Thời gian thực */
+    .time {
+      text-align: right;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    /* Ẩn / hiện trang */
+    .page {
+      display: none;
+    }
+
+    /* Nút chức năng */
+    button {
+      margin: 5px;
+      padding: 8px 12px;
+    }
+
+    input {
+      margin: 3px;
+      width: 120px;
+    }
+
+    .box {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-top: 10px;
+    }
+
+    .note {
+      font-size: 13px;
+      color: #444;
+      margin-top: 5px;
+    }
   </style>
 </head>
 <body>
 
-<!-- ===== HEADER CHUNG ===== -->
-<h1>CÔNG CỤ HỖ TRỢ TÍNH TOÁN-CHUYỂN ĐỔI THÔNG SỐ DCS</h1>
-<div class="time" id="time"></div>
+<!-- ================= HEADER CHUNG CHO MỌI GIAO DIỆN ================= -->
+<div class="title">CÔNG CỤ HỖ TRỢ TÍNH TOÁN-CHUYỂN ĐỔI THÔNG SỐ DCS</div>
+<div id="time" class="time"></div>
 
-<!-- ===== TRANG CHÍNH ===== -->
+<!-- ================= TRANG 1: TRANG CHÍNH ================= -->
 <div id="home" class="page" style="display:block">
-  <h2>Trang chính</h2>
-  <div class="menu">
+  <div class="box">
     <button onclick="showPage('temp')">Tính toán nhiệt độ</button>
-    <button onclick="showPage('dcs')">Module Analog DCS</button>
+    <button onclick="showPage('dcs')">Tính thông số module Analog DCS</button>
     <button onclick="showPage('plc_i')">PLC Analog đo dòng</button>
     <button onclick="showPage('plc_v')">PLC Analog đo áp</button>
   </div>
 </div>
 
-<!-- ===== TRANG NHIỆT ĐỘ ===== -->
+<!-- ================= TRANG 2: NHIỆT ĐỘ ================= -->
 <div id="temp" class="page">
-  <h2>TÍNH TOÁN CHUYỂN ĐỔI NHIỆT ĐỘ PT100, TC K</h2>
-  <p><b>PT100 3 dây</b></p>
-  Rab: <input id="rab"> Rbc: <input id="rbc">
-  <button onclick="calcPT100()">Tính</button>
-  <p id="pt100_rs"></p>
+  <div class="subtitle">TÍNH TOÁN CHUYỂN ĐỔI NHIỆT ĐỘ CỦA PT100, TC LOẠI K</div>
 
-  <p><b>TC loại K</b></p>
-  mV: <input id="mv"> Nhiệt độ môi trường (°C): <input id="amb">
-  <button onclick="calcTC()">Tính</button>
-  <p id="tc_rs"></p>
+  <div class="box">
+    <b>RTD PT100 – 3 dây</b><br>
+    Rab (Ω): <input id="rab">  Rbc (Ω): <input id="rbc">
+    <button onclick="calcPT100()">Tính</button>
+    <div id="pt100_rs"></div>
+    <div class="note">
+      Công thức gần đúng: R = Rab − Rbc;  T = (R − 100) / 0.385
+    </div>
+  </div>
 
-  <button onclick="showPage('home')">Quay lại</button>
+  <div class="box">
+    <b>Thermocouple loại K (có bù nhiệt độ môi trường)</b><br>
+    Điện áp (mV): <input id="mv">  Nhiệt độ môi trường (°C): <input id="amb">
+    <button onclick="calcTC()">Tính</button>
+    <div id="tc_rs"></div>
+    <div class="note">
+      Công thức giản lược: T ≈ (mV × 25) + T_môi_trường
+    </div>
+  </div>
+
+  <button onclick="showPage('home')">Quay lại trang chính</button>
 </div>
 
-<!-- ===== TRANG DCS ===== -->
+<!-- ================= TRANG 3: MODULE ANALOG DCS ================= -->
 <div id="dcs" class="page">
-  <h2>TÍNH TOÁN MODULE ANALOG DCS</h2>
-  Zero: <input id="z1"> Span: <input id="s1">
-  <button onclick="calcAB()">Tính a,b</button>
-  <p id="ab_rs"></p>
+  <div class="subtitle">TÍNH TOÁN - CHUYỂN ĐỔI THÔNG SỐ MODULE ANALOG DCS</div>
 
-  <button onclick="showPage('home')">Quay lại</button>
+  <div class="box">
+    <b>Chức năng 1: Tính hệ số tuyến tính a, b</b><br>
+    Zero: <input id="z1">  Span: <input id="s1">
+    <button onclick="calcAB()">Tính</button>
+    <div id="ab_rs"></div>
+    <div class="note">
+      a = (Span − Zero) / 0.016<br>
+      b = Zero − 0.004 × a
+    </div>
+  </div>
+
+  <div class="box">
+    <b>Chức năng 2: Tính Span từ giá trị đo hiện tại</b><br>
+    Zero: <input id="z2">  Dòng x (mA): <input id="x2">  Giá trị y: <input id="y2">
+    <button onclick="calcSpan()">Tính</button>
+    <div id="span_rs"></div>
+    <div class="note">
+      Span = Zero + 16 × ((y − Zero) / (x − 4))
+    </div>
+  </div>
+
+  <div class="box">
+    <b>Chức năng 3: Tính giá trị đo từ dòng mA</b><br>
+    Zero: <input id="z3">  Span: <input id="s3">  Dòng x (mA): <input id="x3">
+    <button onclick="calcValue()">Tính</button>
+    <div id="value_rs"></div>
+    <div class="note">
+      Value = Zero + ((Span − Zero) / 16) × (x − 4)
+    </div>
+  </div>
+
+  <button onclick="showPage('home')">Quay lại trang chính</button>
 </div>
 
-<!-- ===== PLC DÒNG ===== -->
+<!-- ================= TRANG 4: PLC ĐO DÒNG ================= -->
 <div id="plc_i" class="page">
-  <h2>PLC ANALOG ĐO DÒNG</h2>
-  Zero: <input id="zi"> Span: <input id="si"> Raw: <input id="rawi">
-  <button onclick="calcPLC_I()">Tính</button>
-  <p id="plc_i_rs"></p>
-  <button onclick="showPage('home')">Quay lại</button>
+  <div class="subtitle">MODULE ANALOG PLC SIEMENS (ĐO DÒNG)</div>
+
+  <div class="box">
+    Zero: <input id="zi">  Span: <input id="si">  Raw: <input id="rawi">
+    <button onclick="calcPLC_I()">Tính Scaling</button>
+    <div id="plc_i_rs"></div>
+    <div class="note">
+      Dãy Raw Siemens: 0 → 27648 (0–20mA) hoặc 5530 → 27648 (4–20mA)
+    </div>
+  </div>
+
+  <button onclick="showPage('home')">Quay lại trang chính</button>
 </div>
 
-<!-- ===== PLC ÁP ===== -->
+<!-- ================= TRANG 5: PLC ĐO ÁP ================= -->
 <div id="plc_v" class="page">
-  <h2>PLC ANALOG ĐO ÁP</h2>
-  Zero: <input id="zv"> Span: <input id="sv"> Raw: <input id="rawv">
-  <button onclick="calcPLC_V()">Tính</button>
-  <p id="plc_v_rs"></p>
-  <button onclick="showPage('home')">Quay lại</button>
+  <div class="subtitle">MODULE ANALOG PLC SIEMENS (ĐO ÁP)</div>
+
+  <div class="box">
+    Zero: <input id="zv">  Span: <input id="sv">  Raw: <input id="rawv">
+    <button onclick="calcPLC_V()">Tính Scaling</button>
+    <div id="plc_v_rs"></div>
+    <div class="note">
+      Dãy Raw Siemens 0–10V: 0 → 27648
+    </div>
+  </div>
+
+  <button onclick="showPage('home')">Quay lại trang chính</button>
 </div>
 
+<!-- ================= JAVASCRIPT: XỬ LÝ TÍNH TOÁN ================= -->
 <script>
-// ===== HIỂN THỊ THỜI GIAN THỰC =====
-setInterval(() => {
-  document.getElementById('time').innerText = new Date().toLocaleString();
-}, 1000);
+  // Thời gian thực
+  setInterval(() => {
+    document.getElementById('time').innerText = new Date().toLocaleString();
+  }, 1000);
 
-// ===== ĐIỀU HƯỚNG TRANG =====
-function showPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.style.display='none');
-  document.getElementById(id).style.display='block';
-}
+  // Điều hướng trang
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+    document.getElementById(id).style.display = 'block';
+  }
 
-// ===== PT100 (CÔNG THỨC ĐƠN GIẢN HÓA) =====
-function calcPT100() {
-  let Rab = parseFloat(rab.value);
-  let Rbc = parseFloat(rbc.value);
-  let R = Rab - Rbc; // loại bỏ điện trở dây
-  let T = (R - 100) / 0.385; // gần đúng
-  pt100_rs.innerText = "Nhiệt độ ≈ " + T.toFixed(2) + " °C";
-}
+  // PT100 3 dây
+  function calcPT100() {
+    let Rab = parseFloat(rab.value);
+    let Rbc = parseFloat(rbc.value);
+    let R = Rab - Rbc;
+    let T = (R - 100) / 0.385;
+    pt100_rs.innerText = "Nhiệt độ ≈ " + T.toFixed(2) + " °C";
+  }
 
-// ===== TC K (GIẢN LƯỢC) =====
-function calcTC() {
-  let mvVal = parseFloat(mv.value);
-  let ambVal = parseFloat(amb.value);
-  let T = mvVal * 25 + ambVal;
-  tc_rs.innerText = "Nhiệt độ ≈ " + T.toFixed(2) + " °C";
-}
+  // TC loại K (giản lược)
+  function calcTC() {
+    let T = parseFloat(mv.value) * 25 + parseFloat(amb.value);
+    tc_rs.innerText = "Nhiệt độ ≈ " + T.toFixed(2) + " °C";
+  }
 
-// ===== DCS =====
-function calcAB() {
-  let z = parseFloat(z1.value);
-  let s = parseFloat(s1.value);
-  let a = (s - z) / 0.016;
-  let b = z - 0.004 * a;
-  ab_rs.innerText = "a=" + a.toFixed(2) + ", b=" + b.toFixed(2);
-}
+  // DCS a, b
+  function calcAB() {
+    let z = parseFloat(z1.value);
+    let s = parseFloat(s1.value);
+    let a = (s - z) / 0.016;
+    let b = z - 0.004 * a;
+    ab_rs.innerText = "a = " + a.toFixed(3) + " ; b = " + b.toFixed(3);
+  }
 
-// ===== PLC DÒNG =====
-function calcPLC_I() {
-  let z = parseFloat(zi.value);
-  let s = parseFloat(si.value);
-  let raw = parseFloat(rawi.value);
-  let value = z + (s - z) * (raw / 27648);
-  plc_i_rs.innerText = "Giá trị = " + value.toFixed(2);
-}
+  // Tính Span
+  function calcSpan() {
+    let z = parseFloat(z2.value);
+    let x = parseFloat(x2.value);
+    let y = parseFloat(y2.value);
+    let span = z + 16 * ((y - z) / (x - 4));
+    span_rs.innerText = "Span = " + span.toFixed(3);
+  }
 
-// ===== PLC ÁP =====
-function calcPLC_V() {
-  let z = parseFloat(zv.value);
-  let s = parseFloat(sv.value);
-  let raw = parseFloat(rawv.value);
-  let value = z + (s - z) * (raw / 27648);
-  plc_v_rs.innerText = "Giá trị = " + value.toFixed(2);
-}
+  // Tính Value
+  function calcValue() {
+    let z = parseFloat(z3.value);
+    let s = parseFloat(s3.value);
+    let x = parseFloat(x3.value);
+    let value = z + ((s - z) / 16) * (x - 4);
+    value_rs.innerText = "Giá trị đo = " + value.toFixed(3);
+  }
+
+  // PLC đo dòng
+  function calcPLC_I() {
+    let z = parseFloat(zi.value);
+    let s = parseFloat(si.value);
+    let raw = parseFloat(rawi.value);
+    let value = z + (s - z) * raw / 27648;
+    plc_i_rs.innerText = "Giá trị Scaling = " + value.toFixed(3);
+  }
+
+  // PLC đo áp
+  function calcPLC_V() {
+    let z = parseFloat(zv.value);
+    let s = parseFloat(sv.value);
+    let raw = parseFloat(rawv.value);
+    let value = z + (s - z) * raw / 27648;
+    plc_v_rs.innerText = "Giá trị Scaling = " + value.toFixed(3);
+  }
 </script>
 </body>
 </html>
