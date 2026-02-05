@@ -6,12 +6,18 @@
     <title>Tính toán PLC Siemens</title>
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f7f9; padding: 20px; color: #333; }
-        .container { max-width: 900px; margin: 0 auto; }
+        .container { max-width: 1000px; margin: 0 auto; }
         
+        /* Tiêu đề theo yêu cầu */
         .title-dcs { text-align: center; color: blue; font-weight: bold; font-size: 20px; text-transform: uppercase; margin-bottom: 5px; }
-        .clock-right { text-align: right; font-size: 14px; color: #666; margin-bottom: 10px; font-weight: bold; }
-        .title-plc { text-align: center; color: red; font-weight: bold; font-size: 18px; text-transform: uppercase; margin-bottom: 30px; }
+        .clock-right { text-align: right; font-size: 14px; color: #d35400; margin-bottom: 10px; font-weight: bold; height: 20px; }
+        .title-plc { text-align: center; color: red; font-weight: bold; font-size: 18px; text-transform: uppercase; margin-bottom: 20px; }
 
+        /* Hình ảnh minh họa */
+        .illustration-container { text-align: center; margin-bottom: 25px; }
+        .sensor-img { max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border: 1px solid #ddd; }
+
+        /* Bố cục lưới thẻ */
         .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; }
 
         .card { 
@@ -29,7 +35,7 @@
         
         .input-error { border: 2px solid #dc3545 !important; background-color: #fff8f8; }
 
-        button { width: 100%; padding: 14px; margin-top: 20px; background-color: #006487; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        button { width: 100%; padding: 14px; margin-top: 20px; background-color: #006487; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: 0.3s; }
         button:hover { background-color: #004b66; transform: translateY(-2px); }
 
         .result { margin-top: 15px; padding: 15px; background: #e8f5e9; border-radius: 6px; font-weight: bold; color: #1b5e20; border-left: 5px solid #28a745; }
@@ -48,8 +54,14 @@
 
 <div class="container">
     <div class="title-dcs">CÔNG CỤ HỖ TRỢ TÍNH TOÁN-CHUYỂN ĐỔI THÔNG SỐ DCS</div>
-    <div class="clock-right" id="clock">--:--:--</div>
+    <div class="clock-right" id="clock">Đang khởi tạo thời gian...</div>
     <div class="title-plc">TÍNH TOÁN - CHUYỂN ĐỔI THÔNG SỐ CHO MODULE ANALOG PLC</div>
+
+    <div class="illustration-container">
+        <img src="Pic/PLC_analog.jpg" alt="Sơ đồ khối FC Scaling PLC Siemens" class="sensor-img">
+    </div>
+
+    
 
     <div class="card-grid">
         <div class="card">
@@ -97,31 +109,55 @@
 </div>
 
 <script>
+    // Sửa lỗi hiển thị thời gian
     function updateClock() {
-        document.getElementById('clock').innerText = "Thời gian: " + new Date().toLocaleString('vi-VN');
+        const now = new Date();
+        const timeString = now.getHours().toString().padStart(2, '0') + ":" + 
+                           now.getMinutes().toString().padStart(2, '0') + ":" + 
+                           now.getSeconds().toString().padStart(2, '0') + " - " +
+                           now.toLocaleDateString('vi-VN');
+        document.getElementById('clock').innerText = "Thời gian: " + timeString;
     }
-    setInterval(updateClock, 1000); updateClock();
+    setInterval(updateClock, 1000); 
+    updateClock(); // Chạy ngay lập tức khi load trang
 
     function validate(ids) {
         let valid = true;
         ids.forEach(id => {
             let el = document.getElementById(id);
-            if (el.value === "") { el.classList.add('input-error'); valid = false; }
-            else { el.classList.remove('input-error'); }
+            if (!el.value || el.value.trim() === "") { 
+                el.classList.add('input-error'); 
+                valid = false; 
+            } else { 
+                el.classList.remove('input-error'); 
+            }
         });
         if (!valid) alert("Vui lòng nhập đầy đủ thông số!");
         return valid;
     }
 
-    // Tính Raw sang Scaling (Vật lý)
     function calcScaling() {
         if(!validate(['z1','s1','r1'])) return;
         let z = parseFloat(document.getElementById('z1').value);
         let s = parseFloat(document.getElementById('s1').value);
         let r = parseFloat(document.getElementById('r1').value);
         
-        // Công thức nội suy Siemens (NORM_X & SCALE_X)
         let res = (r / 27648) * (s - z) + z;
-        
         document.getElementById('res1').innerHTML = `Tương ứng giá trị Raw quy đổi Scaling là: <b>${res.toFixed(2)}</b>`;
     }
+
+    function calcRaw() {
+        if(!validate(['z2','s2','sc2'])) return;
+        let z = parseFloat(document.getElementById('z2').value);
+        let s = parseFloat(document.getElementById('s2').value);
+        let sc = parseFloat(document.getElementById('sc2').value);
+        
+        if (s === z) { alert("Lỗi: Span và Zero không được bằng nhau!"); return; }
+        
+        let res = ((sc - z) / (s - z)) * 27648;
+        document.getElementById('res2').innerHTML = `Tương ứng giá trị Scaling quy đổi Raw là: <b>${res.toFixed(0)}</b>`;
+    }
+</script>
+
+</body>
+</html>
