@@ -1,7 +1,19 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8"><link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tính toán nhiệt độ</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Căn giữa và màu xanh cho tiêu đề mục theo yêu cầu */
+        .input-group h3 {
+            text-align: center;
+            color: blue;
+            font-weight: bold;
+            margin-top: 0;
+        }
+    </style>
 </head>
 <body>
     <h1>CÔNG CỤ HỖ TRỢ TÍNH TOÁN-CHUYỂN ĐỔI THÔNG SỐ DCS</h1>
@@ -11,41 +23,64 @@
         
         <div class="input-group">
             <h3>RTD PT100 (3 dây)</h3>
-            <label>Nhập Rab (RTD + dây):</label><input type="number" id="rab">
-            <label>Nhập Rbc (dây):</label><input type="number" id="rbc">
+            <label>Nhập Rab (Điện trở RTD + Dây) (Ohm):</label>
+            <input type="number" id="rab" placeholder="Ví dụ: 108.5">
+            <label>Nhập Rbc (Tổng điện trở dây dẫn) (Ohm):</label>
+            <input type="number" id="rbc" placeholder="Ví dụ: 0.4">
             <button onclick="calcPT()">Tính toán</button>
-            <div id="resPT" class="result"></div>
+            <div id="resPT" class="result">Kết quả: ...</div>
             <div class="tech-note">
                 <b>CHÚ THÍCH KỸ THUẬT:</b><br>
-                - Điện trở cảm biến: $R_{pt} = R_{ab} - 2 \times R_{bc}$.<br>
-                - Nhiệt độ: $T = (R_{pt} - 100) / 0.385$ (Theo tiêu chuẩn DIN 43760).
+                - Vì $R_{bc}$ là tổng điện trở dây: $R_{pt} = R_{ab} - R_{bc}$.<br>
+                - Công thức: $T = \frac{R_{pt} - 100}{0.385}$.
             </div>
         </div>
 
         <div class="input-group">
             <h3>Thermocouple Loại K</h3>
-            <label>Nhập điện áp (mV):</label><input type="number" id="mv">
-            <label>Nhiệt độ môi trường (°C):</label><input type="number" id="amb">
+            <label>Nhập điện áp đo được (mV):</label>
+            <input type="number" id="mv" placeholder="Ví dụ: 10.5">
+            <label>Nhiệt độ môi trường (°C):</label>
+            <input type="number" id="amb" placeholder="Ví dụ: 25">
             <button onclick="calcTC()">Tính toán</button>
-            <div id="resTC" class="result"></div>
+            <div id="resTC" class="result">Kết quả: ...</div>
             <div class="tech-note">
                 <b>CHÚ THÍCH KỸ THUẬT:</b><br>
-                - $V_{total} = V_{input} + V_{cold\_junction}$.<br>
-                - Nhiệt độ lò $T = V_{total} / 0.041$ (Hệ số xấp xỉ 41µV/°C).
+                - Bù nhiệt độ môi trường: $V_{total} = V_{input} + (T_{amb} \times 0.041)$.<br>
+                - Nhiệt độ lò: $T = \frac{V_{total}}{0.041}$.
             </div>
         </div>
+
         <a href="index.html" class="btn-link btn-back">Quay lại trang chính</a>
     </div>
+
     <script>
-        function updateClock() { document.getElementById('clock').innerText = new Date().toLocaleString('vi-VN'); }
-        setInterval(updateClock, 1000); updateClock();
-        function calcPT() {
-            let r = parseFloat(document.getElementById('rab').value) - (2 * parseFloat(document.getElementById('rbc').value));
-            document.getElementById('resPT').innerText = "Nhiệt độ: " + ((r-100)/0.385).toFixed(2) + " °C";
+        function updateClock() { 
+            const now = new Date();
+            document.getElementById('clock').innerText = "Thời gian thực: " + now.toLocaleString('vi-VN'); 
         }
+        setInterval(updateClock, 1000); 
+        updateClock();
+
+        function calcPT() {
+            let rab = parseFloat(document.getElementById('rab').value);
+            let rbc = parseFloat(document.getElementById('rbc').value);
+            if (isNaN(rab) || isNaN(rbc)) { alert("Vui lòng nhập đầy đủ thông số!"); return; }
+            
+            // Công thức đã hiệu chỉnh: Rbc đã là tổng dây nên không nhân 2
+            let r_real = rab - rbc;
+            let temp = (r_real - 100) / 0.385;
+            document.getElementById('resPT').innerHTML = `Điện trở RTD thực tế: ${r_real.toFixed(3)} Ω <br> Nhiệt độ quy đổi: <b>${temp.toFixed(2)} °C</b>`;
+        }
+
         function calcTC() {
-            let v = parseFloat(document.getElementById('mv').value) + (parseFloat(document.getElementById('amb').value) * 0.041);
-            document.getElementById('resTC').innerText = "Nhiệt độ: " + (v/0.041).toFixed(2) + " °C";
+            let mv = parseFloat(document.getElementById('mv').value);
+            let amb = parseFloat(document.getElementById('amb').value);
+            if (isNaN(mv) || isNaN(amb)) { alert("Vui lòng nhập đầy đủ thông số!"); return; }
+
+            let v_total = mv + (amb * 0.041);
+            let temp = v_total / 0.041;
+            document.getElementById('resTC').innerHTML = `Điện áp tổng: ${v_total.toFixed(3)} mV <br> Nhiệt độ lò: <b>${temp.toFixed(2)} °C</b>`;
         }
     </script>
 </body>
