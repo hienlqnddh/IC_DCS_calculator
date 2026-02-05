@@ -1,8 +1,31 @@
-<div class="container">
-    <div style="display: flex; flex-direction: column;">
-        <a href="pages/tinh-nhiet-do.html" class="btn-link">Tính toán nhiệt độ</a>
-        <a href="pages/tinh-dcs.html" class="btn-link">Tính thông số module Analog DCS</a>
-        <a href="pages/tinh-plc-dong.html" class="btn-link">Tính thông module Analog PLC dạng đo dòng</a>
-        <a href="pages/tinh-plc-ap.html" class="btn-link">Tính thông module Analog PLC dạng đo áp</a>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DCS Calculator - Main</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>CÔNG CỤ HỖ TRỢ TÍNH TOÁN-CHUYỂN ĐỔI THÔNG SỐ DCS</h1>
+    <div id="clock"></div>
+    
+    <div class="container">
+        <div style="display: flex; flex-direction: column;">
+            <a href="pages/tinh-nhiet-do.html" class="btn-link">Tính toán nhiệt độ</a>
+            <a href="pages/tinh-dcs.html" class="btn-link">Tính thông số module Analog DCS</a>
+            <a href="pages/tinh-plc-dong.html" class="btn-link">Tính thông module Analog PLC dạng đo dòng</a>
+            <a href="pages/tinh-plc-ap.html" class="btn-link">Tính thông module Analog PLC dạng đo áp</a>
+        </div>
     </div>
-</div>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = "Thời gian thực: " + now.toLocaleString('vi-VN');
+        }
+        setInterval(updateClock, 1000); 
+        updateClock();
+    </script>
+</body>
+</html>
