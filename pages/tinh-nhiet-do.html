@@ -6,57 +6,74 @@
     <title>Tính toán nhiệt độ - IC DCS</title>
     <link rel="stylesheet" href="../style.css">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f9; color: #333; line-height: 1.6; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f7f9; color: #333; line-height: 1.6; }
         h1 { text-align: center; color: #0056b3; text-transform: uppercase; font-size: 1.5rem; margin-top: 20px; }
         #clock { text-align: center; font-weight: bold; color: #666; margin-bottom: 20px; }
         
         .container { max-width: 900px; margin: 0 auto; padding: 10px; }
-        h2 { text-align: center; font-size: 1.2rem; color: #444; margin-bottom: 30px; }
+        h2 { text-align: center; font-size: 1.1rem; color: #444; margin-bottom: 30px; }
 
-        /* Bố cục dạng thẻ (Card Layout) */
         .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
         
         .card { 
             background: #fff; border-radius: 12px; padding: 20px; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-top: 6px solid #007bff;
-            transition: transform 0.2s;
         }
-        .card:hover { transform: translateY(-5px); }
-        .card.tc { border-top-color: #e67e22; } /* Màu cam cho Thermocouple */
+        .card.tc { border-top-color: #e67e22; }
 
         .card h3 { text-align: center; color: #0056b3; margin-top: 0; text-transform: uppercase; font-size: 1.1rem; }
         .card.tc h3 { color: #d35400; }
 
-        /* Input & Component style */
         label { display: block; margin-top: 15px; font-weight: 600; font-size: 0.9rem; }
         input, select { 
-            width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; 
+            width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; 
             border-radius: 6px; box-sizing: border-box; font-size: 1rem;
         }
+        
         button { 
-            width: 100%; padding: 12px; margin-top: 20px; border: none; border-radius: 6px; 
-            background: #007bff; color: white; font-weight: bold; cursor: pointer; transition: 0.3s;
+            width: 100%; padding: 14px; margin-top: 20px; border: none; border-radius: 6px; 
+            background: #007bff; color: white; font-weight: bold; cursor: pointer; font-size: 1rem;
         }
         .card.tc button { background: #e67e22; }
-        button:hover { opacity: 0.9; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        button:hover { filter: brightness(90%); }
 
         .result { 
-            margin-top: 15px; padding: 12px; background: #f8f9fa; 
-            border-radius: 6px; border-left: 4px solid #28a745; font-size: 0.95rem; 
+            margin-top: 15px; padding: 15px; background: #e8f5e9; 
+            border-radius: 6px; border-left: 5px solid #28a745; font-weight: bold;
         }
 
         .sub-case { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #eee; }
-        .active { display: block; animation: fadeIn 0.4s; }
+        .active { display: block; }
 
-        .sensor-img {
-            display: block; margin: 15px auto; max-width: 100%; height: auto;
-            border-radius: 8px; filter: grayscale(20%);
+        .sensor-img { display: block; margin: 15px auto; max-width: 100%; height: auto; border-radius: 8px; }
+
+        /* --- ĐIỀU CHỈNH NÚT QUAY LẠI --- */
+        .btn-back-container { 
+            text-align: center; 
+            margin: 50px 0; 
+        }
+        .btn-back { 
+            display: inline-block;
+            background-color: #6c757d; /* Nền màu xám đậm rõ ràng */
+            color: #ffffff !important; /* Chữ trắng tuyệt đối */
+            padding: 15px 40px; 
+            text-decoration: none; 
+            border-radius: 30px; 
+            font-weight: bold; 
+            font-size: 1.1rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        .btn-back:hover { 
+            background-color: #495057; 
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
         }
 
-        .btn-back-container { text-align: center; margin-top: 40px; }
-        .btn-back { color: #666; text-decoration: none; font-weight: bold; font-size: 0.9rem; }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        /* Bảng tra cứu nhanh */
+        .lookup-table { width: 100%; margin-top: 30px; border-collapse: collapse; background: #fff; font-size: 0.85rem; }
+        .lookup-table th, .lookup-table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        .lookup-table th { background-color: #f2f2f2; }
     </style>
 </head>
 <body>
@@ -70,94 +87,76 @@
             <div class="card">
                 <h3>Cảm biến RTD PT100 (3 dây)</h3>
                 <img src="../Pic/RTD 3 wires.jpg" alt="Sơ đồ RTD" class="sensor-img">
-
                 <label>Vị trí đo đạc:</label>
                 <select id="ptSelection" onchange="toggleCases()">
                     <option value="">-- Chọn phương thức đo --</option>
                     <option value="case1">Đo trực tiếp tại đầu cảm biến</option>
                     <option value="case2">Đo tại tủ điện (Bù điện trở dây)</option>
                 </select>
-
                 <div id="div_case1" class="sub-case">
                     <label>Điện trở RTD đo được (Ω):</label>
                     <input type="number" id="r_direct" placeholder="Ví dụ: 100.00">
                     <button onclick="calcPT_C1()">QUY ĐỔI NHIỆT ĐỘ</button>
-                    <div id="resPT_C1" class="result">Kết quả: -- °C</div>
+                    <div id="resPT_C1" class="result">-- °C</div>
                 </div>
-
                 <div id="div_case2" class="sub-case">
                     <label>R_tổng (RTD + Dây) (Ω):</label>
                     <input type="number" id="r_total" placeholder="Nhập giá trị đo tại tủ">
                     <label>R_dây (Tổng 2 dây bù) (Ω):</label>
                     <input type="number" id="r_wire" placeholder="Ví dụ: 0.4">
                     <button onclick="calcPT_C2()">TÍNH & QUY ĐỔI</button>
-                    <div id="resPT_C2" class="result">Kết quả: -- °C</div>
+                    <div id="resPT_C2" class="result">-- °C</div>
                 </div>
             </div>
 
             <div class="card tc">
                 <h3>Cảm biến Thermocouple Loại K</h3>
-                <div style="height: 150px; display: flex; align-items: center; justify-content: center; background: #fff5ed; border-radius: 8px; margin: 15px 0;">
-                    <span style="font-size: 3rem;">🌡️</span>
-                </div>
-                
+                <div style="height: 150px; display: flex; align-items: center; justify-content: center; background: #fff5ed; border-radius: 8px; margin: 15px 0; font-size: 3rem;">🌡️</div>
                 <label>Điện áp đo được (mV):</label>
                 <input type="number" id="mv" placeholder="Ví dụ: 10.5">
-                
                 <label>Nhiệt độ môi trường (°C):</label>
                 <input type="number" id="amb" value="25">
-                
                 <button onclick="calcTC()">QUY ĐỔI NHIỆT ĐỘ</button>
-                <div id="resTC" class="result">Kết quả: -- °C</div>
-                <p style="font-size: 0.75rem; color: #888; margin-top: 10px;">* Giả định hệ số nhạy 0.041mV/°C</p>
+                <div id="resTC" class="result">-- °C</div>
             </div>
         </div>
 
+        <h3 style="margin-top: 40px; text-align: center;">Bảng tra cứu nhanh PT100 (α = 0.00385)</h3>
+        <table class="lookup-table">
+            <tr><th>Nhiệt độ (°C)</th><th>0</th><th>10</th><th>20</th><th>30</th><th>40</th><th>50</th><th>100</th></tr>
+            <tr><th>Điện trở (Ω)</th><td>100.00</td><td>103.90</td><td>107.79</td><td>111.67</td><td>115.54</td><td>119.40</td><td>138.51</td></tr>
+        </table>
+
         <div class="btn-back-container">
-            <a href="../index.html" class="btn-back">⬅ Quay lại trang danh mục chính</a>
+            <a href="../index.html" class="btn-back">⬅ QUAY LẠI TRANG CHỦ</a>
         </div>
     </div>
 
     <script>
         function updateClock() { 
-            const now = new Date();
-            document.getElementById('clock').innerText = "Thời gian thực: " + now.toLocaleString('vi-VN'); 
+            document.getElementById('clock').innerText = "Thời gian thực: " + new Date().toLocaleString('vi-VN'); 
         }
         setInterval(updateClock, 1000); updateClock();
 
         function toggleCases() {
             let selection = document.getElementById('ptSelection').value;
-            document.getElementById('div_case1').classList.remove('active');
-            document.getElementById('div_case2').classList.remove('active');
-
-            if (selection === 'case1') document.getElementById('div_case1').classList.add('active');
-            else if (selection === 'case2') document.getElementById('div_case2').classList.add('active');
+            document.getElementById('div_case1').style.display = (selection === 'case1') ? 'block' : 'none';
+            document.getElementById('div_case2').style.display = (selection === 'case2') ? 'block' : 'none';
         }
 
-        // Logic tính toán giữ nguyên nhưng làm tròn đẹp hơn
         function calcPT_C1() {
             let r = parseFloat(document.getElementById('r_direct').value);
-            if (isNaN(r)) return;
-            let temp = (r - 100) / 0.38505; // Hệ số chuẩn DIN
-            document.getElementById('resPT_C1').innerHTML = `Nhiệt độ tương ứng: <b>${temp.toFixed(2)} °C</b>`;
+            if (!isNaN(r)) document.getElementById('resPT_C1').innerHTML = `Kết quả: ${((r - 100) / 0.385).toFixed(2)} °C`;
         }
 
         function calcPT_C2() {
-            let rt = parseFloat(document.getElementById('r_total').value);
-            let rw = parseFloat(document.getElementById('r_wire').value);
-            if (isNaN(rt) || isNaN(rw)) return;
-            let r_real = rt - rw;
-            let temp = (r_real - 100) / 0.38505;
-            document.getElementById('resPT_C2').innerHTML = `R_thực: ${r_real.toFixed(3)} Ω <br> Nhiệt độ: <b>${temp.toFixed(2)} °C</b>`;
+            let rt = parseFloat(document.getElementById('r_total').value), rw = parseFloat(document.getElementById('r_wire').value);
+            if (!isNaN(rt) && !isNaN(rw)) document.getElementById('resPT_C2').innerHTML = `Kết quả: ${((rt - rw - 100) / 0.385).toFixed(2)} °C`;
         }
 
         function calcTC() {
-            let mv = parseFloat(document.getElementById('mv').value);
-            let amb = parseFloat(document.getElementById('amb').value);
-            if (isNaN(mv) || isNaN(amb)) return;
-            // Công thức xấp xỉ cho loại K
-            let temp = (mv / 0.041) + amb;
-            document.getElementById('resTC').innerHTML = `Nhiệt độ quy đổi: <b>${temp.toFixed(2)} °C</b>`;
+            let mv = parseFloat(document.getElementById('mv').value), amb = parseFloat(document.getElementById('amb').value);
+            if (!isNaN(mv) && !isNaN(amb)) document.getElementById('resTC').innerHTML = `Kết quả: ${((mv / 0.041) + amb).toFixed(2)} °C`;
         }
     </script>
 </body>
