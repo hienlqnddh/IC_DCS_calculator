@@ -4,22 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tính toán nhiệt độ</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../style.css">
     <style>
         .input-group h3 { text-align: center; color: blue; font-weight: bold; margin-top: 0; }
         .case-selector { 
             width: 100%; padding: 10px; margin-bottom: 15px; 
             border: 2px solid #007bff; border-radius: 5px; font-weight: bold; 
+            background-color: #fff;
         }
         .sub-case { 
             background: #fdfdfd; border: 1px solid #eee; 
             padding: 15px; border-radius: 4px; display: none; 
         }
         .active { display: block; }
-        .img-placeholder { 
-            display: block; margin: 10px auto; max-width: 100%; 
-            border: 1px dashed #ccc; padding: 10px; text-align: center; color: #888;
-        }
     </style>
 </head>
 <body>
@@ -57,8 +54,7 @@
             </div>
 
             <div class="tech-note">
-                Ứng dụng kiểm tra nhiệt độ thực tế của PT100. 
-                Sử dụng hệ số tiêu chuẩn α = 0.00385.
+                Ứng dụng để kiểm tra giá trị nhiệt độ thực tế của cảm biến RTD PT100. Dựa vào vị trí đo để xác định việc có khấu trừ điện trở đường dây hay không.
             </div>
         </div>
 
@@ -74,11 +70,11 @@
             <button onclick="calcTC()">Tính toán</button>
             <div id="resTC" class="result"></div>
             <div class="tech-note">
-                Quy đổi mV sang nhiệt độ có bù Cold Junction (hệ số xấp xỉ 41µV/°C).
+                Ứng dụng để quy đổi giá trị điện áp mV của can nhiệt loại K sang nhiệt độ thực tế, có tính đến yếu tố bù nhiệt độ tại điểm đấu nối (Cold Junction).
             </div>
         </div>
 
-        <a href="index.html" class="btn-link btn-back">Quay lại trang chính</a>
+        <a href="../index.html" class="btn-link btn-back">Quay lại trang chính</a>
     </div>
 
     <script>
@@ -101,7 +97,7 @@
 
         function calcPT_C1() {
             let r = parseFloat(document.getElementById('r_direct').value);
-            if (isNaN(r)) { alert("Vui lòng nhập giá trị điện trở"); return; }
+            if (isNaN(r)) { alert("Vui lòng nhập giá trị điện trở!"); return; }
             let temp = (r - 100) / 0.385;
             document.getElementById('resPT_C1').innerHTML = `Với giá trị điện trở được nhập là ${r} Ω thì nhiệt độ là: <b>${temp.toFixed(2)} °C</b>`;
         }
@@ -109,7 +105,7 @@
         function calcPT_C2() {
             let rt = parseFloat(document.getElementById('r_total').value);
             let rw = parseFloat(document.getElementById('r_wire').value);
-            if (isNaN(rt) || isNaN(rw)) { alert("Vui lòng nhập đủ thông số"); return; }
+            if (isNaN(rt) || isNaN(rw)) { alert("Vui lòng nhập đủ thông số!"); return; }
             let r_real = rt - rw;
             let temp = (r_real - 100) / 0.385;
             document.getElementById('resPT_C2').innerHTML = `Điện trở RTD thực tế: ${r_real.toFixed(3)} Ω <br> Nhiệt độ quy đổi: <b>${temp.toFixed(2)} °C</b>`;
@@ -118,10 +114,10 @@
         function calcTC() {
             let mv = parseFloat(document.getElementById('mv').value);
             let amb = parseFloat(document.getElementById('amb').value);
-            if (isNaN(mv) || isNaN(amb)) { alert("Vui lòng nhập đủ mV và nhiệt độ môi trường"); return; }
+            if (isNaN(mv) || isNaN(amb)) { alert("Vui lòng nhập đủ mV và nhiệt độ môi trường!"); return; }
             let v_total = mv + (amb * 0.041);
             let temp = v_total / 0.041;
-            document.getElementById('resTC').innerHTML = `Nhiệt độ lò quy đổi: <b>${temp.toFixed(2)} °C</b>`;
+            document.getElementById('resTC').innerHTML = `Nhiệt độ quy đổi: <b>${temp.toFixed(2)} °C</b>`;
         }
     </script>
 </body>
