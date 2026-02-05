@@ -12,15 +12,7 @@
             color: blue;
             font-weight: bold;
             margin-top: 0;
-        }
-        /* Style riêng cho phần ghi chú ứng dụng */
-        .app-note {
-            font-size: 14px;
-            color: #28a745;
-            font-style: italic;
-            margin-bottom: 10px;
-            display: block;
-            text-align: center;
+            font-size: 18px;
         }
     </style>
 </head>
@@ -32,43 +24,36 @@
         
         <div class="input-group">
             <h3>1. Tính hệ số a, b</h3>
-            <span class="app-note">Được ứng dụng để tính hệ số a, b dùng trong quá trình tạo Point và thay đổi dãy của point,...</span>
-            <label>Điểm Zero:</label><input type="number" id="z1" placeholder="Ví dụ: 0">
-            <label>Điểm Span:</label><input type="number" id="s1" placeholder="Ví dụ: 100">
+            <label>Điểm Zero:</label><input type="number" id="z1" placeholder="Nhập điểm Zero">
+            <label>Điểm Span:</label><input type="number" id="s1" placeholder="Nhập điểm Span">
             <button onclick="calcDCS1()">Tính hệ số</button>
             <div id="resDCS1" class="result">Kết quả: ...</div>
             <div class="tech-note">
-                <b>Công thức:</b><br>
-                $Cc1(a) = \frac{Span - Zero}{0.016}$ <br>
-                $Cc2(b) = Zero - (0.004 \times a)$
+                Được ứng dụng để tính hệ số a, b dùng trong quá trình tạo Point và thay đổi dãy của point,...
             </div>
         </div>
 
         <div class="input-group">
             <h3>2. Tính Span từ đo thực tế</h3>
-            <span class="app-note">Được ứng dụng để tìm dãy đo thực tế của point dựa vào giá trị làm việc và dòng đang vận hành</span>
-            <label>Điểm Zero:</label><input type="number" id="z2" placeholder="Ví dụ: 0">
-            <label>Dòng tín hiệu x (mA):</label><input type="number" id="x2" placeholder="Ví dụ: 12">
-            <label>Giá trị đo hiện tại y:</label><input type="number" id="y2" placeholder="Giá trị hiển thị trên DCS">
+            <label>Điểm Zero:</label><input type="number" id="z2" placeholder="Nhập điểm Zero">
+            <label>Dòng tín hiệu x (mA):</label><input type="number" id="x2" placeholder="Nhập mA">
+            <label>Giá trị đo hiện tại y:</label><input type="number" id="y2" placeholder="Nhập giá trị hiển thị y">
             <button onclick="calcDCS2()">Tính Span</button>
             <div id="resDCS2" class="result">Kết quả: ...</div>
             <div class="tech-note">
-                <b>Công thức:</b><br>
-                $Span = Zero + 16 \times \frac{y - Zero}{x - 4}$
+                Được ứng dụng để tìm dãy đo thực tế của point dựa vào giá trị làm việc và dòng đang vận hành.
             </div>
         </div>
 
         <div class="input-group">
             <h3>3. Tính giá trị đo từ mA</h3>
-            <span class="app-note">Được ứng dụng để tìm giá trị Scale của Point dựa vào dòng thực tế module nhận được</span>
-            <label>Điểm Zero:</label><input type="number" id="z3" placeholder="Ví dụ: 0">
-            <label>Điểm Span:</label><input type="number" id="s3" placeholder="Ví dụ: 100">
-            <label>Dòng tín hiệu x (mA):</label><input type="number" id="x3" placeholder="Ví dụ: 20">
+            <label>Điểm Zero:</label><input type="number" id="z3" placeholder="Nhập điểm Zero">
+            <label>Điểm Span:</label><input type="number" id="s3" placeholder="Nhập điểm Span">
+            <label>Dòng tín hiệu x (mA):</label><input type="number" id="x3" placeholder="Nhập mA thực tế">
             <button onclick="calcDCS3()">Tính Giá trị</button>
             <div id="resDCS3" class="result">Kết quả: ...</div>
             <div class="tech-note">
-                <b>Công thức:</b><br>
-                $Value = Zero + \frac{Span - Zero}{16} \times (x - 4)$
+                Được ứng dụng để tìm giá trị Scale của Point dựa vào dòng thực tế module nhận được.
             </div>
         </div>
 
@@ -101,7 +86,7 @@
             if (x === 4) { alert("Dòng mA phải khác 4 để tránh lỗi chia cho 0"); return; }
 
             let span = z + 16 * ((y - z) / (x - 4));
-            document.getElementById('resDCS2').innerHTML = `Dãy làm việc: từ <b>${z}</b> đến <b>${span.toFixed(2)}</b>`;
+            document.getElementById('resDCS2').innerHTML = `Điểm đo có dãy làm việc từ: <b>${z}</b> đến <b>${span.toFixed(2)}</b>`;
         }
 
         function calcDCS3() {
@@ -111,7 +96,7 @@
             if (isNaN(z) || isNaN(s) || isNaN(x)) { alert("Vui lòng nhập đủ thông số"); return; }
 
             let val = z + ((s - z) / 16) * (x - 4);
-            document.getElementById('resDCS3').innerHTML = `Giá trị đo được (tương đương ${x} mA) là: <b>${val.toFixed(2)}</b>`;
+            document.getElementById('resDCS3').innerHTML = `Giá trị đo được tương đương ${x} mA là: <b>${val.toFixed(2)}</b>`;
         }
     </script>
 </body>
