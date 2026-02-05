@@ -1,72 +1,51 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tính Nhiệt Độ</title>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8"><link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="clock">...</div>
+    <h1>CÔNG CỤ HỖ TRỢ TÍNH TOÁN-CHUYỂN ĐỔI THÔNG SỐ DCS</h1>
+    <div id="clock"></div>
     <div class="container">
-        <h1>CÔNG CỤ HỖ TRỢ TÍNH TOÁN-CHUYỂN ĐỔI THÔNG SỐ DCS</h1>
         <h2>TÍNH TOÁN CHUYỂN ĐỔI NHIỆT ĐỘ CỦA PT100, TC LOẠI K</h2>
-
+        
         <div class="input-group">
-            <h3>1. Chuyển đổi nhiệt độ RTD PT100 (3 dây)</h3>
-            <label>Nhập Rab (Điện trở RTD + Dây) (Ohm):</label>
-            <input type="number" id="pt100_Rab" placeholder="Ví dụ: 108">
-            <label>Nhập Rbc (Điện trở dây bù) (Ohm):</label>
-            <input type="number" id="pt100_Rbc" placeholder="Ví dụ: 0.5">
-            <button onclick="calcPT100()">Tính Nhiệt Độ</button>
-            <div class="result" id="res_pt100">Kết quả: ...</div>
+            <h3>RTD PT100 (3 dây)</h3>
+            <label>Nhập Rab (RTD + dây):</label><input type="number" id="rab">
+            <label>Nhập Rbc (dây):</label><input type="number" id="rbc">
+            <button onclick="calcPT()">Tính toán</button>
+            <div id="resPT" class="result"></div>
             <div class="tech-note">
-                <strong>Chú thích kỹ thuật:</strong><br>
-                CT: R_sensor = Rab - 2*Rbc. Nhiệt độ T = (R_sensor - 100) / 0.385.
+                <b>CHÚ THÍCH KỸ THUẬT:</b><br>
+                - Điện trở cảm biến: $R_{pt} = R_{ab} - 2 \times R_{bc}$.<br>
+                - Nhiệt độ: $T = (R_{pt} - 100) / 0.385$ (Theo tiêu chuẩn DIN 43760).
             </div>
         </div>
 
         <div class="input-group">
-            <h3>2. Chuyển đổi TC loại K (Bù nhiệt môi trường)</h3>
-            <label>Nhập Điện áp đo được (mV):</label>
-            <input type="number" id="tc_mV" placeholder="Ví dụ: 4.096">
-            <label>Nhập Nhiệt độ môi trường (°C):</label>
-            <input type="number" id="tc_amb" placeholder="Ví dụ: 25">
-            <button onclick="calcTCK()">Tính Nhiệt Độ</button>
-            <div class="result" id="res_tck">Kết quả: ...</div>
+            <h3>Thermocouple Loại K</h3>
+            <label>Nhập điện áp (mV):</label><input type="number" id="mv">
+            <label>Nhiệt độ môi trường (°C):</label><input type="number" id="amb">
+            <button onclick="calcTC()">Tính toán</button>
+            <div id="resTC" class="result"></div>
             <div class="tech-note">
-                <strong>Chú thích kỹ thuật:</strong><br>
-                CT: V_total = V_đo + (T_mt * 0.041). T_lò = V_total / 0.041.
+                <b>CHÚ THÍCH KỸ THUẬT:</b><br>
+                - $V_{total} = V_{input} + V_{cold\_junction}$.<br>
+                - Nhiệt độ lò $T = V_{total} / 0.041$ (Hệ số xấp xỉ 41µV/°C).
             </div>
         </div>
-
         <a href="index.html" class="btn-link btn-back">Quay lại trang chính</a>
     </div>
-
     <script>
-        // Copy đoạn script đồng hồ vào đây để trang nào cũng chạy
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('clock').innerText = "Thời gian thực: " + now.toLocaleString('vi-VN');
-        }
+        function updateClock() { document.getElementById('clock').innerText = new Date().toLocaleString('vi-VN'); }
         setInterval(updateClock, 1000); updateClock();
-
-        function calcPT100() {
-            let Rab = parseFloat(document.getElementById('pt100_Rab').value);
-            let Rbc = parseFloat(document.getElementById('pt100_Rbc').value);
-            if (isNaN(Rab) || isNaN(Rbc)) return;
-            let R_sensor = Rab - (2 * Rbc);
-            let Temp = (R_sensor - 100) / 0.385;
-            document.getElementById('res_pt100').innerText = `R thực: ${R_sensor.toFixed(3)} Ω => Nhiệt độ: ${Temp.toFixed(2)} °C`;
+        function calcPT() {
+            let r = parseFloat(document.getElementById('rab').value) - (2 * parseFloat(document.getElementById('rbc').value));
+            document.getElementById('resPT').innerText = "Nhiệt độ: " + ((r-100)/0.385).toFixed(2) + " °C";
         }
-
-        function calcTCK() {
-            let mV = parseFloat(document.getElementById('tc_mV').value);
-            let amb = parseFloat(document.getElementById('tc_amb').value);
-            if (isNaN(mV) || isNaN(amb)) return;
-            let V_total = mV + (amb * 0.041);
-            let Temp = V_total / 0.041;
-            document.getElementById('res_tck').innerText = `Áp tổng: ${V_total.toFixed(3)} mV => Nhiệt độ: ${Temp.toFixed(2)} °C`;
+        function calcTC() {
+            let v = parseFloat(document.getElementById('mv').value) + (parseFloat(document.getElementById('amb').value) * 0.041);
+            document.getElementById('resTC').innerText = "Nhiệt độ: " + (v/0.041).toFixed(2) + " °C";
         }
     </script>
 </body>
