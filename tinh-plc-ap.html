@@ -1,67 +1,48 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tính PLC Áp</title>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8"><link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="clock">...</div>
+    <h1>CÔNG CỤ HỖ TRỢ TÍNH TOÁN-CHUYỂN ĐỔI THÔNG SỐ DCS</h1>
+    <div id="clock"></div>
     <div class="container">
-        <h1>CÔNG CỤ HỖ TRỢ TÍNH TOÁN-CHUYỂN ĐỔI THÔNG SỐ DCS</h1>
-        <h2>TÍNH TOÁN -CHUYỂN ĐỔI THÔNG SỐ CHO MODULE ANALOG PLC (Đo áp)</h2>
-        <p style="text-align: center;">(Áp dụng cho PLC Siemens)</p>
-
+        <h2>TÍNH TOÁN -CHUYỂN ĐỔI THÔNG SỐ CHO MODULE ANALOG PLC (đo áp)</h2>
+        
         <div class="input-group">
-            <h3>CN1: Tính Scale (Dạng 0-10V)</h3>
-            <label>Zero / Span:</label>
-            <input type="number" id="plc_v1_zero" placeholder="Zero">
-            <input type="number" id="plc_v1_span" placeholder="Span" style="margin-top:5px;">
-            <label>Giá trị Raw (Thô):</label><input type="number" id="plc_v1_raw">
-            <button onclick="calcPLC_V1()">Quy đổi</button>
-            <div class="result" id="res_plc_v1">Kết quả: ...</div>
-            <div class="tech-note">Scale = ((Raw / 27648) * (Span - Zero)) + Zero</div>
+            <h3>0-10V: Raw -> Scaling</h3>
+            <label>Zero:</label><input type="number" id="zRA">
+            <label>Span:</label><input type="number" id="sRA">
+            <label>Raw (0-27648):</label><input type="number" id="rawA">
+            <button onclick="calcScaleA()">Quy đổi</button>
+            <div id="resScaleA" class="result"></div>
         </div>
 
         <div class="input-group">
-            <h3>CN2: Tính Raw từ Scale (Dạng 0-10V)</h3>
-            <label>Zero / Span:</label>
-            <input type="number" id="plc_v2_zero" placeholder="Zero">
-            <input type="number" id="plc_v2_span" placeholder="Span" style="margin-top:5px;">
-            <label>Giá trị Scaling:</label><input type="number" id="plc_v2_val">
-            <button onclick="calcPLC_V2()">Quy đổi Raw</button>
-            <div class="result" id="res_plc_v2">Kết quả: ...</div>
-            <div class="tech-note">Raw = ((Value - Zero) / (Span - Zero)) * 27648</div>
+            <h3>0-10V: Scaling -> Raw</h3>
+            <label>Zero:</label><input type="number" id="zVA">
+            <label>Span:</label><input type="number" id="sVA">
+            <label>Giá trị Scaling:</label><input type="number" id="valA">
+            <button onclick="calcRawA()">Quy đổi</button>
+            <div id="resRawA" class="result"></div>
+            <div class="tech-note">
+                <b>CHÚ THÍCH KỸ THUẬT:</b><br>
+                - Module áp Siemens 0-10V tương ứng dải Raw 0 - 27648.<br>
+                - Công thức nội suy tuyến tính: $y = \frac{x - x_{min}}{x_{max} - x_{min}} \times (y_{max} - y_{min}) + y_{min}$.
+            </div>
         </div>
-
         <a href="index.html" class="btn-link btn-back">Quay lại trang chính</a>
     </div>
-
     <script>
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('clock').innerText = "Thời gian thực: " + now.toLocaleString('vi-VN');
-        }
+        function updateClock() { document.getElementById('clock').innerText = new Date().toLocaleString('vi-VN'); }
         setInterval(updateClock, 1000); updateClock();
-
-        function plcScale(raw, z, s) { return ((raw / 27648) * (s - z)) + z; }
-        function plcRaw(val, z, s) { return ((val - z) / (s - z)) * 27648; }
-
-        function calcPLC_V1() {
-            let z = parseFloat(document.getElementById('plc_v1_zero').value);
-            let s = parseFloat(document.getElementById('plc_v1_span').value);
-            let r = parseFloat(document.getElementById('plc_v1_raw').value);
-            let res = plcScale(r, z, s);
-            document.getElementById('res_plc_v1').innerText = `Scaling: ${res.toFixed(2)}`;
+        function calcScaleA() {
+            let res = (parseFloat(document.getElementById('rawA').value) / 27648) * (parseFloat(document.getElementById('sRA').value) - parseFloat(document.getElementById('zRA').value)) + parseFloat(document.getElementById('zRA').value);
+            document.getElementById('resScaleA').innerText = "Scaling: " + res.toFixed(2);
         }
-
-        function calcPLC_V2() {
-            let z = parseFloat(document.getElementById('plc_v2_zero').value);
-            let s = parseFloat(document.getElementById('plc_v2_span').value);
-            let v = parseFloat(document.getElementById('plc_v2_val').value);
-            let res = plcRaw(v, z, s);
-            document.getElementById('res_plc_v2').innerText = `Raw: ${Math.round(res)}`;
+        function calcRawA() {
+            let res = (parseFloat(document.getElementById('valA').value) - parseFloat(document.getElementById('zVA').value)) / (parseFloat(document.getElementById('sVA').value) - parseFloat(document.getElementById('zVA').value)) * 27648;
+            document.getElementById('resRawA').innerText = "Raw: " + Math.round(res);
         }
     </script>
 </body>
