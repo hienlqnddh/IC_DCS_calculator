@@ -3,71 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IC DCS Calculator - Hệ Thống Tính Toán PLC/DCS</title>
+    <title>IC DCS Calculator - Trang Chủ</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .menu-grid {
+        .menu-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
-            padding: 20px 0;
+            margin-top: 30px;
         }
-        .menu-card {
+        .card {
             background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
+            padding: 25px;
+            border-radius: 12px;
             text-decoration: none;
             color: #333;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
-            border-bottom: 4px solid #006487;
+            transition: all 0.3s ease;
+            border-left: 6px solid #006487;
         }
-        .menu-card:hover {
+        .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
         }
-        .menu-card h3 { margin-top: 0; color: #006487; }
-        .menu-card p { font-size: 0.9em; color: #666; }
-        .icon { font-size: 40px; margin-bottom: 10px; display: block; }
+        .card h3 { margin: 0 0 10px 0; color: #006487; }
+        .card p { margin: 0; font-size: 14px; color: #666; }
+        .status-tag {
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 11px;
+            background: #e6f2f7;
+            color: #006487;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <header style="text-align: center; margin-bottom: 40px;">
-        <h1>IC DCS Calculator</h1>
-        <p>Công cụ hỗ trợ kỹ thuật điều khiển và tự động hóa</p>
+    <header style="text-align: center; padding: 40px 0;">
+        <h1 style="font-size: 2.5em; margin-bottom: 10px;">IC DCS Calculator</h1>
+        <p style="color: #555;">Hệ thống công cụ tính toán tự động hóa chuyên dụng</p>
     </header>
 
-    <main class="menu-grid">
-        <a href="pages/tinh-plc-dong.html" class="menu-card">
-            <span class="icon">⚡</span>
-            <h3>Tính PLC Dòng</h3>
-            <p>Chuyển đổi tín hiệu 4-20mA sang giá trị vật lý và ngược lại.</p>
+    <main class="menu-container">
+        <a href="pages/tinh-plc.html" class="card">
+            <h3>PLC Analog Scaling</h3>
+            <p>Tính toán Scale tín hiệu Analog chuẩn Siemens (0-27648), RTD (x10, x100).</p>
+            <span class="status-tag">SIEMENS STANDARD</span>
         </a>
 
-        <a href="pages/tinh-plc-ap.html" class="menu-card">
-            <span class="icon">⏲️</span>
-            <h3>Tính PLC Áp Suất</h3>
-            <p>Tính toán áp suất từ tín hiệu Analog (mA/V) chuẩn công nghiệp.</p>
+        <a href="pages/tinh-plc-dong.html" class="card" style="border-left-color: #28a745;">
+            <h3>Tính PLC Dòng (4-20mA)</h3>
+            <p>Chuyển đổi linh hoạt giữa dòng điện mA và giá trị đại lượng vật lý.</p>
+            <span class="status-tag" style="background:#e8f5e9; color:#28a745;">ANALOG 4-20mA</span>
         </a>
 
-        <a href="pages/tinh-plc.html" class="menu-card" style="border-bottom-color: #009999;">
-            <span class="icon">🌡️</span>
-            <h3>Tính Nhiệt Độ (Siemens)</h3>
-            <p>Xử lý Raw Data (0-27648) và giá trị RTD/TC cho S7-1200/1500.</p>
-        </a>
-
-        <a href="pages/tinh-dcs.html" class="menu-card" style="border-bottom-color: #ff9900;">
-            <span class="icon">🏗️</span>
-            <h3>Tính DCS</h3>
-            <p>Các công thức tính toán dành riêng cho hệ thống DCS.</p>
+        <a href="pages/tinh-dcs.html" class="card" style="border-left-color: #ff9900;">
+            <h3>Tính toán hệ DCS</h3>
+            <p>Các công cụ và hằng số tính toán dành riêng cho hệ thống điều khiển phân tán.</p>
+            <span class="status-tag" style="background:#fff3e0; color:#ff9900;">DCS TOOLS</span>
         </a>
     </main>
 
-    <footer style="text-align: center; margin-top: 50px; color: #888; font-size: 0.8em;">
-        <p>&copy; 2026 IC_DCS_calculator Project</p>
+    <footer style="margin-top: 60px; text-align: center; border-top: 1px solid #eee; padding-top: 20px; color: #999;">
+        <p>&copy; 2026 IC_DCS_calculator | Updated for Siemens Integration</p>
     </footer>
 </div>
 
