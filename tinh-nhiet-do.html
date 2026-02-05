@@ -6,13 +6,9 @@
     <title>Tính toán nhiệt độ</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Căn giữa và màu xanh cho tiêu đề mục theo yêu cầu */
-        .input-group h3 {
-            text-align: center;
-            color: blue;
-            font-weight: bold;
-            margin-top: 0;
-        }
+        .input-group h3 { text-align: center; color: blue; font-weight: bold; margin-top: 0; }
+        .sub-case { background: #fdfdfd; border: 1px solid #eee; padding: 10px; margin-top: 10px; border-radius: 4px; }
+        .sub-title { color: #d63384; font-weight: bold; margin-bottom: 10px; display: block; border-bottom: 1px dashed #d63384; padding-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -23,16 +19,29 @@
         
         <div class="input-group">
             <h3>RTD PT100 (3 dây)</h3>
-            <label>Nhập Rab (Điện trở RTD + Dây) (Ohm):</label>
-            <input type="number" id="rab" placeholder="Ví dụ: 108.5">
-            <label>Nhập Rbc (Tổng điện trở dây dẫn) (Ohm):</label>
-            <input type="number" id="rbc" placeholder="Ví dụ: 0.4">
-            <button onclick="calcPT()">Tính toán</button>
-            <div id="resPT" class="result">Kết quả: ...</div>
+            
+            <div class="sub-case">
+                <span class="sub-title">Trường hợp 1: Đo trực tiếp tại thiết bị</span>
+                <label>Nhập điện trở RTD đo được (Ohm):</label>
+                <input type="number" id="r_direct" placeholder="Ví dụ: 100.00">
+                <button onclick="calcPT_C1()">Quy đổi nhiệt độ</button>
+                <div id="resPT_C1" class="result">Kết quả: ...</div>
+            </div>
+
+            <div class="sub-case">
+                <span class="sub-title">Trường hợp 2: Đo tại tủ điện (Phòng điện tử)</span>
+                <label>Nhập R_tổng (RTD + Dây) (Ohm):</label>
+                <input type="number" id="r_total" placeholder="Ví dụ: 108.5">
+                <label>Nhập R_dây (Tổng điện trở dây dẫn) (Ohm):</label>
+                <input type="number" id="r_wire" placeholder="Ví dụ: 0.4">
+                <button onclick="calcPT_C2()">Tính toán & Quy đổi</button>
+                <div id="resPT_C2" class="result">Kết quả: ...</div>
+            </div>
+
             <div class="tech-note">
-                <b>CHÚ THÍCH KỸ THUẬT:</b><br>
-                - Vì $R_{bc}$ là tổng điện trở dây: $R_{pt} = R_{ab} - R_{bc}$.<br>
-                - Công thức: $T = \frac{R_{pt} - 100}{0.385}$.
+                Ứng dụng để kiểm tra giá trị nhiệt độ thực tế của cảm biến RTD PT100. <br>
+                - TH1: Đo trực tiếp không tính trở dây. <br>
+                - TH2: Đo tại tủ, tự động khấu trừ trở dây để tìm nhiệt độ thực.
             </div>
         </div>
 
@@ -45,9 +54,7 @@
             <button onclick="calcTC()">Tính toán</button>
             <div id="resTC" class="result">Kết quả: ...</div>
             <div class="tech-note">
-                <b>CHÚ THÍCH KỸ THUẬT:</b><br>
-                - Bù nhiệt độ môi trường: $V_{total} = V_{input} + (T_{amb} \times 0.041)$.<br>
-                - Nhiệt độ lò: $T = \frac{V_{total}}{0.041}$.
+                Ứng dụng để quy đổi giá trị điện áp mV của can nhiệt loại K sang nhiệt độ thực tế, có tính đến yếu tố bù nhiệt độ tại điểm đấu nối (Cold Junction).
             </div>
         </div>
 
@@ -56,31 +63,37 @@
 
     <script>
         function updateClock() { 
-            const now = new Date();
-            document.getElementById('clock').innerText = "Thời gian thực: " + now.toLocaleString('vi-VN'); 
+            document.getElementById('clock').innerText = "Thời gian thực: " + new Date().toLocaleString('vi-VN'); 
         }
-        setInterval(updateClock, 1000); 
-        updateClock();
+        setInterval(updateClock, 1000); updateClock();
 
-        function calcPT() {
-            let rab = parseFloat(document.getElementById('rab').value);
-            let rbc = parseFloat(document.getElementById('rbc').value);
-            if (isNaN(rab) || isNaN(rbc)) { alert("Vui lòng nhập đầy đủ thông số!"); return; }
+        // PT100 - TH1: Đo tại thiết bị
+        function calcPT_C1() {
+            let r = parseFloat(document.getElementById('r_direct').value);
+            if (isNaN(r)) { alert("Vui lòng nhập điện trở!"); return; }
+            let temp = (r - 100) / 0.385;
+            document.getElementById('resPT_C1').innerHTML = `Với giá trị điện trở được nhập là ${r} Ω thì nhiệt độ là: <b>${temp.toFixed(2)} °C</b>`;
+        }
+
+        // PT100 - TH2: Đo tại phòng điện tử
+        function calcPT_C2() {
+            let rt = parseFloat(document.getElementById('r_total').value);
+            let rw = parseFloat(document.getElementById('r_wire').value);
+            if (isNaN(rt) || isNaN(rw)) { alert("Vui lòng nhập đủ R tổng và R dây!"); return; }
             
-            // Công thức đã hiệu chỉnh: Rbc đã là tổng dây nên không nhân 2
-            let r_real = rab - rbc;
+            let r_real = rt - rw;
             let temp = (r_real - 100) / 0.385;
-            document.getElementById('resPT').innerHTML = `Điện trở RTD thực tế: ${r_real.toFixed(3)} Ω <br> Nhiệt độ quy đổi: <b>${temp.toFixed(2)} °C</b>`;
+            document.getElementById('resPT_C2').innerHTML = `Điện trở RTD thực tế: ${r_real.toFixed(3)} Ω <br> Nhiệt độ quy đổi: <b>${temp.toFixed(2)} °C</b>`;
         }
 
+        // Thermocouple
         function calcTC() {
             let mv = parseFloat(document.getElementById('mv').value);
             let amb = parseFloat(document.getElementById('amb').value);
-            if (isNaN(mv) || isNaN(amb)) { alert("Vui lòng nhập đầy đủ thông số!"); return; }
-
+            if (isNaN(mv) || isNaN(amb)) { alert("Vui lòng nhập đầy đủ!"); return; }
             let v_total = mv + (amb * 0.041);
             let temp = v_total / 0.041;
-            document.getElementById('resTC').innerHTML = `Điện áp tổng: ${v_total.toFixed(3)} mV <br> Nhiệt độ lò: <b>${temp.toFixed(2)} °C</b>`;
+            document.getElementById('resTC').innerHTML = `Điện áp sau bù: ${v_total.toFixed(3)} mV <br> Nhiệt độ lò: <b>${temp.toFixed(2)} °C</b>`;
         }
     </script>
 </body>
