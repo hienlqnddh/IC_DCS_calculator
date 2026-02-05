@@ -7,28 +7,41 @@
     <h1>CÔNG CỤ HỖ TRỢ TÍNH TOÁN-CHUYỂN ĐỔI THÔNG SỐ DCS</h1>
     <div id="clock"></div>
     <div class="container">
-        <h2>TÍNH TOÁN -CHUYỂN ĐỔI THÔNG SỐ CHO MODULE ANALOG PLC (đo áp)</h2>
+        <h2>TÍNH TOÁN -CHUYỂN ĐỔI THÔNG SỐ CHO MODULE ANALOG PLC (đo dòng)</h2>
         
         <div class="input-group">
-            <h3>0-10V: Raw -> Scaling</h3>
-            <label>Zero:</label><input type="number" id="zRA">
-            <label>Span:</label><input type="number" id="sRA">
-            <label>Raw (0-27648):</label><input type="number" id="rawA">
-            <button onclick="calcScaleA()">Quy đổi</button>
-            <div id="resScaleA" class="result"></div>
+            <h3>Tính Scaling (Raw -> Thực)</h3>
+            <label>Dạng module:</label>
+            <select id="modeRaw">
+                <option value="420">4-20mA</option>
+                <option value="020">0-20mA</option>
+            </select>
+            <label>Zero:</label><input type="number" id="zR">
+            <label>Span:</label><input type="number" id="sR">
+            <label>Raw (0-27648):</label><input type="number" id="raw">
+            <button onclick="calcScale()">Quy đổi Scaling</button>
+            <div id="resScale" class="result"></div>
+            <div class="tech-note">
+                <b>Ví dụ:</b> Cảm biến áp suất 0-10 Bar. Dải Raw Siemens 0-27648.<br>
+                <b>Công thức:</b> $Value = \frac{Raw}{27648} \times (Span - Zero) + Zero$.
+            </div>
         </div>
 
         <div class="input-group">
-            <h3>0-10V: Scaling -> Raw</h3>
-            <label>Zero:</label><input type="number" id="zVA">
-            <label>Span:</label><input type="number" id="sVA">
-            <label>Giá trị Scaling:</label><input type="number" id="valA">
-            <button onclick="calcRawA()">Quy đổi</button>
-            <div id="resRawA" class="result"></div>
+            <h3>Tính Raw (Thực -> Raw)</h3>
+            <label>Dạng module:</label>
+            <select id="modeVal">
+                <option value="420">4-20mA</option>
+                <option value="020">0-20mA</option>
+            </select>
+            <label>Zero:</label><input type="number" id="zV">
+            <label>Span:</label><input type="number" id="sV">
+            <label>Giá trị Scaling:</label><input type="number" id="val">
+            <button onclick="calcRaw()">Quy đổi Raw</button>
+            <div id="resRaw" class="result"></div>
             <div class="tech-note">
-                <b>CHÚ THÍCH KỸ THUẬT:</b><br>
-                - Module áp Siemens 0-10V tương ứng dải Raw 0 - 27648.<br>
-                - Công thức nội suy tuyến tính: $y = \frac{x - x_{min}}{x_{max} - x_{min}} \times (y_{max} - y_{min}) + y_{min}$.
+                <b>Công thức:</b> $Raw = \frac{Value - Zero}{Span - Zero} \times 27648$.<br>
+                Ghi chú: Dãy Raw module Siemens từ 0 đến 27648.
             </div>
         </div>
         <a href="index.html" class="btn-link btn-back">Quay lại trang chính</a>
@@ -36,13 +49,13 @@
     <script>
         function updateClock() { document.getElementById('clock').innerText = new Date().toLocaleString('vi-VN'); }
         setInterval(updateClock, 1000); updateClock();
-        function calcScaleA() {
-            let res = (parseFloat(document.getElementById('rawA').value) / 27648) * (parseFloat(document.getElementById('sRA').value) - parseFloat(document.getElementById('zRA').value)) + parseFloat(document.getElementById('zRA').value);
-            document.getElementById('resScaleA').innerText = "Scaling: " + res.toFixed(2);
+        function calcScale() {
+            let res = (parseFloat(document.getElementById('raw').value) / 27648) * (parseFloat(document.getElementById('sR').value) - parseFloat(document.getElementById('zR').value)) + parseFloat(document.getElementById('zR').value);
+            document.getElementById('resScale').innerText = "Scaling: " + res.toFixed(2);
         }
-        function calcRawA() {
-            let res = (parseFloat(document.getElementById('valA').value) - parseFloat(document.getElementById('zVA').value)) / (parseFloat(document.getElementById('sVA').value) - parseFloat(document.getElementById('zVA').value)) * 27648;
-            document.getElementById('resRawA').innerText = "Raw: " + Math.round(res);
+        function calcRaw() {
+            let res = (parseFloat(document.getElementById('val').value) - parseFloat(document.getElementById('zV').value)) / (parseFloat(document.getElementById('sV').value) - parseFloat(document.getElementById('zV').value)) * 27648;
+            document.getElementById('resRaw').innerText = "Raw: " + Math.round(res);
         }
     </script>
 </body>
