@@ -10,57 +10,59 @@
         h1 { text-align: center; color: #0056b3; text-transform: uppercase; font-size: 1.5rem; margin-top: 20px; }
         #clock { text-align: center; font-weight: bold; color: #666; margin-bottom: 20px; }
         
-        .container { max-width: 1000px; margin: 0 auto; padding: 10px; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 10px; }
         h2 { text-align: center; font-size: 1.1rem; color: #444; margin-bottom: 30px; text-transform: uppercase; }
 
-        /* Bố cục dạng thẻ (Card Layout) */
         .card-grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
-            gap: 20px; 
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
+            gap: 25px; 
             margin-bottom: 30px;
         }
         
         .card { 
             background: #fff; border-radius: 12px; padding: 25px; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
-            border-top: 6px solid #fd7e14; /* Màu cam đặc trưng cho DCS */
+            border-top: 6px solid #fd7e14;
             display: flex;
             flex-direction: column;
         }
 
-        .card h3 { text-align: center; color: #d35400; margin-top: 0; text-transform: uppercase; font-size: 1.1rem; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .card h3 { text-align: center; color: #d35400; margin: 0; text-transform: uppercase; font-size: 1.1rem; }
+        
+        /* Đưa ghi chú lên trên */
+        .tech-note-top {
+            background: #fffbf5;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-size: 0.85rem;
+            color: #6c757d;
+            border-left: 3px solid #ffca28;
+            font-style: italic;
+        }
 
-        label { display: block; margin-top: 15px; font-weight: 600; font-size: 0.9rem; }
+        label { display: block; margin-top: 10px; font-weight: 600; font-size: 0.9rem; }
         input { 
-            width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; 
+            width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; 
             border-radius: 6px; box-sizing: border-box; font-size: 1rem;
         }
         
         button { 
             width: 100%; padding: 14px; margin-top: 20px; border: none; border-radius: 6px; 
             background: #fd7e14; color: white; font-weight: bold; cursor: pointer; font-size: 1rem;
-            transition: background 0.3s;
         }
         button:hover { background: #e67e22; }
 
         .result { 
-            margin-top: 15px; padding: 15px; background: #fff8f1; 
-            border-radius: 6px; border-left: 5px solid #fd7e14; font-weight: bold; font-size: 0.95rem;
+            margin-top: 15px; padding: 15px; background: #e8f5e9; 
+            border-radius: 6px; border-left: 5px solid #28a745; font-weight: bold; color: #1b5e20;
         }
 
-        .tech-note {
-            margin-top: 15px; font-size: 0.8rem; color: #7f8c8d; font-style: italic; line-height: 1.3;
-        }
-
-        /* --- ĐIỀU CHỈNH NÚT QUAY LẠI TO RÕ --- */
-        .btn-back-container { 
-            text-align: center; 
-            margin: 50px 0; 
-        }
+        .btn-back-container { text-align: center; margin: 50px 0; }
         .btn-back { 
             display: inline-block;
-            background-color: #6c757d; /* Màu xám đậm */
+            background-color: #6c757d;
             color: #ffffff !important; 
             padding: 16px 45px; 
             text-decoration: none; 
@@ -68,18 +70,11 @@
             font-weight: bold; 
             font-size: 1.1rem;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
             text-transform: uppercase;
         }
-        .btn-back:hover { 
-            background-color: #495057; 
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
-        }
+        .btn-back:hover { background-color: #495057; transform: translateY(-3px); }
 
-        @media (max-width: 600px) {
-            .card-grid { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 600px) { .card-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -92,51 +87,45 @@
         <div class="card-grid">
             <div class="card">
                 <h3>1. Tính hệ số a, b</h3>
+                <div class="tech-note-top">
+                    Dùng để tính hằng số Cc1(a) và Cc2(b) khi khởi tạo Point hoặc thay đổi dãy đo trên hệ thống DCS.
+                </div>
                 <label>Điểm Zero:</label>
                 <input type="number" id="z1" placeholder="Nhập điểm Zero">
-                <label>Điểm Span:</label>
+                <label>Điểm Span (URV):</label>
                 <input type="number" id="s1" placeholder="Nhập điểm Span">
-                
                 <button onclick="calcDCS1()">TÍNH HỆ SỐ</button>
-                
-                <div id="resDCS1" class="result">Kết quả: ...</div>
-                <div class="tech-note">
-                    Ứng dụng tính hệ số a, b để tạo Point hoặc thay đổi Scale range trong DCS.
-                </div>
+                <div id="resDCS1" class="result">Kết quả: --</div>
             </div>
 
             <div class="card">
-                <h3>2. Tính Span thực tế</h3>
+                <h3>2. Tính Span từ thực tế</h3>
+                <div class="tech-note-top">
+                    Tìm dải đo (Span) thực tế của Point dựa vào giá trị hiển thị và dòng điện vận hành hiện tại.
+                </div>
                 <label>Điểm Zero:</label>
                 <input type="number" id="z2" placeholder="Nhập điểm Zero">
                 <label>Dòng tín hiệu x (mA):</label>
-                <input type="number" id="x2" placeholder="Nhập mA hiện tại">
+                <input type="number" id="x2" placeholder="Nhập mA thực tế">
                 <label>Giá trị hiển thị y:</label>
                 <input type="number" id="y2" placeholder="Nhập giá trị y">
-                
                 <button onclick="calcDCS2()">TÍNH SPAN</button>
-                
-                <div id="resDCS2" class="result">Kết quả: ...</div>
-                <div class="tech-note">
-                    Tìm dãy đo thực tế dựa trên giá trị làm việc và dòng điện vận hành hiện tại.
-                </div>
+                <div id="resDCS2" class="result">Kết quả: --</div>
             </div>
 
             <div class="card">
                 <h3>3. Giá trị đo từ mA</h3>
+                <div class="tech-note-top">
+                    Xác định giá trị đại lượng vật lý tương ứng với dòng điện mA mà Module nhận được.
+                </div>
                 <label>Điểm Zero:</label>
                 <input type="number" id="z3" placeholder="Nhập điểm Zero">
-                <label>Điểm Span:</label>
+                <label>Điểm Span (URV):</label>
                 <input type="number" id="s3" placeholder="Nhập điểm Span">
                 <label>Dòng tín hiệu x (mA):</label>
-                <input type="number" id="x3" placeholder="Nhập mA thực tế">
-                
+                <input type="number" id="x3" placeholder="Nhập mA đầu vào">
                 <button onclick="calcDCS3()">TÍNH GIÁ TRỊ</button>
-                
-                <div id="resDCS3" class="result">Kết quả: ...</div>
-                <div class="tech-note">
-                    Xác định giá trị quy đổi tương ứng với dòng điện mA đầu vào của Module.
-                </div>
+                <div id="resDCS3" class="result">Kết quả: --</div>
             </div>
         </div>
 
@@ -156,7 +145,6 @@
             let zero = parseFloat(document.getElementById('z1').value);
             let span = parseFloat(document.getElementById('s1').value);
             if (isNaN(zero) || isNaN(span)) return;
-            
             let a = (span - zero) / 0.016;
             let b = zero - (0.004 * a);
             document.getElementById('resDCS1').innerHTML = `a = <b>${a.toFixed(4)}</b> <br> b = <b>${b.toFixed(4)}</b>`;
@@ -167,7 +155,6 @@
             let x = parseFloat(document.getElementById('x2').value);
             let y = parseFloat(document.getElementById('y2').value);
             if (isNaN(z) || isNaN(x) || isNaN(y) || x === 4) return;
-
             let span = z + 16 * ((y - z) / (x - 4));
             document.getElementById('resDCS2').innerHTML = `Dãy đo: <b>${z}</b> đến <b>${span.toFixed(2)}</b>`;
         }
@@ -177,9 +164,8 @@
             let s = parseFloat(document.getElementById('s3').value);
             let x = parseFloat(document.getElementById('x3').value);
             if (isNaN(z) || isNaN(s) || isNaN(x)) return;
-
             let val = z + ((s - z) / 16) * (x - 4);
-            document.getElementById('resDCS3').innerHTML = `Giá trị đo: <b>${val.toFixed(2)}</b>`;
+            document.getElementById('resDCS3').innerHTML = `Giá trị quy đổi: <b>${val.toFixed(2)}</b>`;
         }
     </script>
 </body>
