@@ -6,50 +6,42 @@
     <title>Tính toán nhiệt độ</title>
     <link rel="stylesheet" href="../style.css">
     <style>
-        /* Giữ lại các tùy chỉnh giao diện đặc trưng */
-        .input-group h3 { 
-            text-align: center; 
-            color: blue; 
-            font-weight: bold; 
-            margin-top: 0; 
-        }
+        .input-group h3 { text-align: center; color: blue; font-weight: bold; margin-top: 0; }
         .case-selector { 
-            width: 100%; 
-            padding: 10px; 
-            margin-bottom: 15px; 
-            border: 2px solid #007bff; 
-            border-radius: 5px; 
-            font-weight: bold; 
-            cursor: pointer;
+            width: 100%; padding: 10px; margin-bottom: 15px; 
+            border: 2px solid #007bff; border-radius: 5px; font-weight: bold; 
+            background-color: #fff;
         }
         .sub-case { 
-            background: #f9f9f9; 
-            border: 1px solid #ddd; 
-            padding: 15px; 
-            border-radius: 4px; 
-            display: none; /* Ẩn các trường hợp khi chưa chọn */
-            margin-bottom: 10px;
+            background: #fdfdfd; border: 1px solid #eee; 
+            padding: 15px; border-radius: 4px; display: none; 
         }
-        .active { 
-            display: block !important; /* Hiện trường hợp được chọn */
+        .active { display: block; }
+        /* Style cho hình ảnh */
+        .sensor-img {
+            display: block;
+            margin: 15px auto;
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
     </style>
 </head>
 <body>
     <h1>CÔNG CỤ HỖ TRỢ TÍNH TOÁN-CHUYỂN ĐỔI THÔNG SỐ DCS</h1>
     <div id="clock"></div>
-    
     <div class="container">
         <h2>TÍNH TOÁN CHUYỂN ĐỔI NHIỆT ĐỘ CỦA PT100, TC LOẠI K</h2>
         
         <div class="input-group">
             <h3>RTD PT100 (3 dây)</h3>
             
-            
+            <img src="../Pic/RTD 3 wires.jpg" alt="Sơ đồ đấu nối RTD 3 dây" class="sensor-img">
 
             <label>Chọn vị trí đo đạc:</label>
             <select id="ptSelection" class="case-selector" onchange="toggleCases()">
-                <option value="">-- Click để chọn vị trí đo --</option>
+                <option value="">-- Vui lòng chọn vị trí --</option>
                 <option value="case1">Đo trực tiếp tại thiết bị</option>
                 <option value="case2">Đo tại tủ điện (Phòng điện tử)</option>
             </select>
@@ -69,44 +61,32 @@
                 <button onclick="calcPT_C2()">Tính toán & Quy đổi</button>
                 <div id="resPT_C2" class="result"></div>
             </div>
-
-            <div class="tech-note">
-                Dùng để kiểm tra nhiệt độ thực tế của RTD PT100. Lưu ý khấu trừ trở dây nếu đo từ xa tại tủ điện.
-            </div>
         </div>
-
-        <hr>
 
         <div class="input-group">
             <h3>Thermocouple Loại K</h3>
             
             
-
+            
             <label>Nhập điện áp đo được (mV):</label>
             <input type="number" id="mv" placeholder="Ví dụ: 10.5">
             <label>Nhiệt độ môi trường (°C):</label>
             <input type="number" id="amb" placeholder="Ví dụ: 25">
             <button onclick="calcTC()">Tính toán</button>
             <div id="resTC" class="result"></div>
-            <div class="tech-note">
-                Quy đổi mV sang độ C cho can nhiệt loại K (có bù nhiệt độ môi trường).
-            </div>
         </div>
 
         <a href="../index.html" class="btn-link btn-back">Quay lại trang chính</a>
     </div>
 
     <script>
-        // Cập nhật đồng hồ
         function updateClock() { 
             document.getElementById('clock').innerText = "Thời gian thực: " + new Date().toLocaleString('vi-VN'); 
         }
-        setInterval(updateClock, 1000); 
-        updateClock();
+        setInterval(updateClock, 1000); updateClock();
 
-        // Hàm ẩn/hiện trường hợp đo
         function toggleCases() {
-            const selection = document.getElementById('ptSelection').value;
+            let selection = document.getElementById('ptSelection').value;
             document.getElementById('div_case1').classList.remove('active');
             document.getElementById('div_case2').classList.remove('active');
 
@@ -117,31 +97,25 @@
             }
         }
 
-        // Tính TH1
         function calcPT_C1() {
             let r = parseFloat(document.getElementById('r_direct').value);
             if (isNaN(r)) return;
-            let temp = (r - 100) / 0.385;
-            document.getElementById('resPT_C1').innerHTML = `Với giá trị điện trở được nhập là ${r} Ω thì nhiệt độ là: <b>${temp.toFixed(2)} °C</b>`;
+            document.getElementById('resPT_C1').innerHTML = `Với giá trị điện trở được nhập là ${r} Ω thì nhiệt độ là: <b>${((r - 100) / 0.385).toFixed(2)} °C</b>`;
         }
 
-        // Tính TH2
         function calcPT_C2() {
             let rt = parseFloat(document.getElementById('r_total').value);
             let rw = parseFloat(document.getElementById('r_wire').value);
             if (isNaN(rt) || isNaN(rw)) return;
             let r_real = rt - rw;
-            let temp = (r_real - 100) / 0.385;
-            document.getElementById('resPT_C2').innerHTML = `Điện trở thực tế: ${r_real.toFixed(3)} Ω <br> Nhiệt độ: <b>${temp.toFixed(2)} °C</b>`;
+            document.getElementById('resPT_C2').innerHTML = `Điện trở thực tế: ${r_real.toFixed(3)} Ω <br> Nhiệt độ: <b>${((r_real - 100) / 0.385).toFixed(2)} °C</b>`;
         }
 
-        // Tính TC loại K
         function calcTC() {
             let mv = parseFloat(document.getElementById('mv').value);
             let amb = parseFloat(document.getElementById('amb').value);
             if (isNaN(mv) || isNaN(amb)) return;
-            let temp = (mv + (amb * 0.041)) / 0.041;
-            document.getElementById('resTC').innerHTML = `Nhiệt độ quy đổi: <b>${temp.toFixed(2)} °C</b>`;
+            document.getElementById('resTC').innerHTML = `Nhiệt độ quy đổi: <b>${((mv + (amb * 0.041)) / 0.041).toFixed(2)} °C</b>`;
         }
     </script>
 </body>
