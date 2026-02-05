@@ -3,157 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tính toán PLC Siemens - IC DCS</title>
-    <link rel="stylesheet" href="../style.css">
+    <title>Tính toán PLC Siemens</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f9; color: #333; line-height: 1.6; }
-        h1 { text-align: center; color: #0056b3; text-transform: uppercase; font-size: 1.5rem; margin-top: 20px; }
-        #clock { text-align: center; font-weight: bold; color: #666; margin-bottom: 20px; }
+        body { font-family: Arial, sans-serif; line-height: 1.5; padding: 20px; background-color: #f9f9f9; }
+        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 20px; border: 1px solid #ccc; }
         
-        .container { max-width: 600px; margin: 0 auto; padding: 10px; }
-        h2 { text-align: center; font-size: 1.1rem; color: #444; margin-bottom: 25px; text-transform: uppercase; }
-
-        .card { 
-            background: #fff; border-radius: 12px; padding: 30px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
-            border-top: 6px solid #006487; /* Màu xanh đặc trưng Siemens */
-        }
-
-        .tech-note-top {
-            background: #f0f7f9; padding: 12px; border-radius: 5px; margin-bottom: 20px;
-            font-size: 0.85rem; color: #444; border-left: 3px solid #006487; font-style: italic;
-        }
-
-        label { display: block; margin-top: 15px; font-weight: 600; font-size: 0.9rem; }
-        input, select { 
-            width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; 
-            border-radius: 6px; box-sizing: border-box; font-size: 1rem;
-        }
+        /* Dòng 1: Tiêu đề DCS */
+        .title-dcs { text-align: center; color: blue; font-weight: bold; font-size: 20px; text-transform: uppercase; margin-bottom: 5px; }
         
-        /* Đánh dấu lỗi khi chưa nhập */
-        .input-error { border: 2px solid #dc3545 !important; background-color: #fff8f8; }
+        /* Dòng 2: Thời gian bên phải */
+        .clock-right { text-align: right; font-size: 14px; color: #333; margin-bottom: 10px; }
+        
+        /* Dòng 3: Tiêu đề PLC */
+        .title-plc { text-align: center; color: red; font-weight: bold; font-size: 18px; text-transform: uppercase; margin-bottom: 25px; }
 
-        button { 
-            width: 100%; padding: 15px; margin-top: 25px; border: none; border-radius: 6px; 
-            background: #006487; color: white; font-weight: bold; cursor: pointer; font-size: 1.1rem;
-        }
-        button:hover { background: #004b66; }
+        .card { border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 20px; background-color: #fff; }
+        .tech-note { background: #fffde7; border-left: 4px solid #fbc02d; padding: 10px; font-size: 13px; margin-bottom: 15px; color: #555; }
+        
+        label { display: block; font-weight: bold; margin-top: 10px; font-size: 14px; }
+        input { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .input-error { border: 2px solid red !important; }
 
-        .result { 
-            margin-top: 20px; padding: 18px; background: #e8f5e9; 
-            border-radius: 6px; border-left: 5px solid #28a745; font-weight: bold; 
-            color: #1b5e20; font-size: 1.1rem; text-align: center;
-        }
+        button { width: 100%; padding: 10px; margin-top: 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
 
-        /* Nút Quay lại to rõ */
-        .btn-back-container { text-align: center; margin: 40px 0; }
-        .btn-back { 
-            display: inline-block; background-color: #6c757d; color: #ffffff !important; 
-            padding: 16px 45px; text-decoration: none; border-radius: 35px; 
-            font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            text-transform: uppercase; transition: 0.3s;
-        }
-        .btn-back:hover { background-color: #495057; transform: translateY(-3px); }
+        .result { margin-top: 15px; padding: 10px; background: #e8f5e9; border-left: 4px solid #28a745; font-weight: bold; color: #155724; }
+
+        .btn-back-container { text-align: center; margin-top: 30px; }
+        .btn-back { display: inline-block; padding: 12px 30px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; }
+        .btn-back:hover { background-color: #5a6268; }
     </style>
 </head>
 <body>
-    <h1>CÔNG CỤ HỖ TRỢ TÍNH TOÁN - CHUYỂN ĐỔI ANALOG</h1>
-    <div id="clock"></div>
 
-    <div class="container">
-        <h2>SCALING ANALOG PLC SIEMENS (S7-1200/1500)</h2>
-        
-        <div class="card">
-            <div class="tech-note-top">
-                Sử dụng để nội suy giá trị vật lý từ vùng nhớ Raw (0-27648) hoặc giá trị RTD/TC (x10) chuẩn Siemens.
-            </div>
+<div class="container">
+    <div class="title-dcs">CÔNG CỤ HỖ TRỢ TÍNH TOÁN-CHUYỂN ĐỔI THÔNG SỐ DCS</div>
+    <div class="clock-right" id="clock">Đang tải thời gian...</div>
+    <div class="title-plc">TÍNH TOÁN -CHUYỂN ĐỔI THÔNG SỐ CHO MODULE ANALOG PLC (đo dòng)</div>
 
-            <label>Chế độ tính toán:</label>
-            <select id="calcMode" onchange="updateUI()">
-                <option value="analog">Module Analog Chuẩn (0 - 27648)</option>
-                <option value="rtd">Module RTD/TC (Giá trị x10)</option>
-            </select>
-
-            <div id="rangeSettings">
-                <label>Dải đo vật lý (LRV - URV):</label>
-                <div style="display: flex; gap: 10px;">
-                    <input type="number" id="min_range" value="0" placeholder="Min">
-                    <input type="number" id="max_range" value="100" placeholder="Max">
-                </div>
-            </div>
-
-            <label id="labelRaw">Giá trị Raw (IW/PIW):</label>
-            <input type="number" id="raw_input" placeholder="Nhập số nguyên từ PLC">
-
-            <button onclick="doCalculate()">XỬ LÝ DỮ LIỆU</button>
-
-            <div id="res_val" class="result">Kết quả: --</div>
+    <div class="card">
+        <h3>1. Tính Scaling (Module 4-20mA)</h3>
+        <div class="tech-note">
+            <b>Chú thích:</b> Công thức nội suy: $Scaling = \frac{Raw}{27648} \times (Span - Zero) + Zero$.<br>
+            <b>Ví dụ:</b> Dãy Raw Siemens là 0 đến 27648 (tương ứng 4-20mA).
         </div>
-
-        <div class="btn-back-container">
-            <a href="../index.html" class="btn-back">⬅ QUAY LẠI TRANG CHỦ</a>
-        </div>
+        <label>Điểm Zero:</label><input type="number" id="z1">
+        <label>Điểm Span:</label><input type="number" id="s1">
+        <label>Giá trị Raw (Thô):</label><input type="number" id="r1">
+        <button onclick="calc1()">TÍNH TOÁN</button>
+        <div id="res1" class="result">Kết quả: --</div>
     </div>
 
-    <script>
-        function updateClock() { 
-            document.getElementById('clock').innerText = "Thời gian thực: " + new Date().toLocaleString('vi-VN'); 
-        }
-        setInterval(updateClock, 1000); updateClock();
+    <div class="card">
+        <h3>2. Tính Scaling (Module 0-20mA)</h3>
+        <div class="tech-note">
+            <b>Chú thích:</b> Đối với module 0-20mA, dãy Raw Siemens vẫn là 0 đến 27648.<br>
+            <b>Công thức:</b> $Scaling = \frac{Raw}{27648} \times (Span - Zero) + Zero$.
+        </div>
+        <label>Điểm Zero:</label><input type="number" id="z2">
+        <label>Điểm Span:</label><input type="number" id="s2">
+        <label>Giá trị Raw (Thô):</label><input type="number" id="r2">
+        <button onclick="calc2()">TÍNH TOÁN</button>
+        <div id="res2" class="result">Kết quả: --</div>
+    </div>
 
-        function updateUI() {
-            const mode = document.getElementById('calcMode').value;
-            const rangeSet = document.getElementById('rangeSettings');
-            const label = document.getElementById('labelRaw');
-            
-            if (mode === 'analog') {
-                rangeSet.style.display = 'block';
-                label.innerText = "Giá trị Raw (0 - 27648):";
-            } else {
-                rangeSet.style.display = 'none';
-                label.innerText = "Giá trị Raw (x10):";
-            }
-        }
+    <div class="card">
+        <h3>3. Tính Raw từ Scaling (Module 4-20mA)</h3>
+        <div class="tech-note">
+            <b>Chú thích:</b> Dùng để tìm giá trị PLC nhận được từ đại lượng vật lý.<br>
+            <b>Công thức:</b> $Raw = \frac{Scaling - Zero}{Span - Zero} \times 27648$.<br>
+            <i>Ghi chú: Dãy Raw của module Siemens S7-1200/1500 là từ 0 đến 27648.</i>
+        </div>
+        <label>Điểm Zero:</label><input type="number" id="z3">
+        <label>Điểm Span:</label><input type="number" id="s3">
+        <label>Giá trị Scaling:</label><input type="number" id="sc3">
+        <button onclick="calc3()">TÍNH TOÁN</button>
+        <div id="res3" class="result">Kết quả: --</div>
+    </div>
 
-        function validatePLC() {
-            let mode = document.getElementById('calcMode').value;
-            let fields = ['raw_input'];
-            if (mode === 'analog') fields.push('min_range', 'max_range');
-            
-            let isValid = true;
-            fields.forEach(id => {
-                let el = document.getElementById(id);
-                if (el.value.trim() === "") {
-                    el.classList.add('input-error');
-                    isValid = false;
-                } else {
-                    el.classList.remove('input-error');
-                }
-            });
-            return isValid;
-        }
+    <div class="card">
+        <h3>4. Tính Raw từ Scaling (Module 0-20mA)</h3>
+        <div class="tech-note">
+            <b>Chú thích:</b> Tương tự module 4-20mA nhưng dòng điện thực tế bắt đầu từ 0mA.<br>
+            <i>Ghi chú: Dãy Raw của module Siemens S7-1200/1500 là từ 0 đến 27648.</i>
+        </div>
+        <label>Điểm Zero:</label><input type="number" id="z4">
+        <label>Điểm Span:</label><input type="number" id="s4">
+        <label>Giá trị Scaling:</label><input type="number" id="sc4">
+        <button onclick="calc4()">TÍNH TOÁN</button>
+        <div id="res4" class="result">Kết quả: --</div>
+    </div>
 
-        function doCalculate() {
-            if (!validatePLC()) {
-                alert("Vui lòng nhập đầy đủ các thông số trước khi tính!");
-                return;
-            }
+    <div class="btn-back-container">
+        <a href="../index.html" class="btn-back">QUAY LẠI TRANG CHÍNH</a>
+    </div>
+</div>
 
-            const mode = document.getElementById('calcMode').value;
-            const raw = parseFloat(document.getElementById('raw_input').value);
-            let result = 0;
+<script>
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('clock').innerText = "Thời gian: " + now.toLocaleString('vi-VN');
+    }
+    setInterval(updateClock, 1000); updateClock();
 
-            if (mode === 'rtd') {
-                result = raw / 10;
-            } else {
-                const min = parseFloat(document.getElementById('min_range').value);
-                const max = parseFloat(document.getElementById('max_range').value);
-                // Công thức chuẩn Siemens SCALE_X & NORM_X
-                result = (raw / 27648) * (max - min) + min;
-            }
+    function validate(ids) {
+        let valid = true;
+        ids.forEach(id => {
+            let el = document.getElementById(id);
+            if (el.value === "") { el.classList.add('input-error'); valid = false; }
+            else { el.classList.remove('input-error'); }
+        });
+        if (!valid) alert("Vui lòng nhập đầy đủ thông số!");
+        return valid;
+    }
 
-            document.getElementById('res_val').innerHTML = `Giá trị quy đổi: <b>${result.toFixed(2)}</b>`;
-        }
-    </script>
+    // Chức năng 1 & 2 (Giống nhau về công thức Siemens Raw 0-27648)
+    function calc1() {
+        if(!validate(['z1','s1','r1'])) return;
+        let z = parseFloat(document.getElementById('z1').value), s = parseFloat(document.getElementById('s1').value), r = parseFloat(document.getElementById('r1').value);
+        let res = (r / 27648) * (s - z) + z;
+        document.getElementById('res1').innerText = "Tương ứng Giá trị Raw (Thô) quy đổi Scaling là: " + res.toFixed(2);
+    }
+    function calc2() {
+        if(!validate(['z2','s2','r2'])) return;
+        let z = parseFloat(document.getElementById('z2').value), s = parseFloat(document.getElementById('s2').value), r = parseFloat(document.getElementById('r2').value);
+        let res = (r / 27648) * (s - z) + z;
+        document.getElementById('res2').innerText = "Tương ứng Giá trị Raw (Thô) quy đổi Scaling là: " + res.toFixed(2);
+    }
+
+    // Chức năng 3 & 4
+    function calc3() {
+        if(!validate(['z3','s3','sc3'])) return;
+        let z = parseFloat(document.getElementById('z3').value), s = parseFloat(document.getElementById('s3').value), sc = parseFloat(document.getElementById('sc3').value);
+        let res = ((sc - z) / (s - z)) * 27648;
+        document.getElementById('res3').innerText = "Tương ứng Giá trị Scaling quy đổi Giá trị Raw (Thô) là: " + res.toFixed(0);
+    }
+    function calc4() {
+        if(!validate(['z4','s4','sc4'])) return;
+        let z = parseFloat(document.getElementById('z4').value), s = parseFloat(document.getElementById('s4').value), sc = parseFloat(document.getElementById('sc4').value);
+        let res = ((sc - z) / (s - z)) * 27648;
+        document.getElementById('res4').innerText = "Tương ứng Giá trị Scaling quy đổi Giá trị Raw (Thô) là: " + res.toFixed(0);
+    }
+</script>
+
 </body>
 </html>
