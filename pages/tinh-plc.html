@@ -8,20 +8,13 @@
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f7f9; padding: 20px; color: #333; }
         .container { max-width: 1000px; margin: 0 auto; }
         
-        /* 1. Dòng đầu: In đậm, màu xanh, canh giữa, cỡ chữ 20 */
         .title-dcs { text-align: center; color: blue; font-weight: bold; font-size: 20px; text-transform: uppercase; margin-bottom: 5px; }
-        
-        /* 2. Dòng hai: Thời gian bên phải */
         .clock-right { text-align: right; font-size: 15px; color: #d35400; margin-bottom: 10px; font-weight: bold; min-height: 20px; }
-        
-        /* 3. Dòng ba: In đậm, màu đỏ, canh giữa, cỡ chữ 18 */
         .title-plc { text-align: center; color: red; font-weight: bold; font-size: 18px; text-transform: uppercase; margin-bottom: 25px; }
 
-        /* Hình ảnh minh họa */
         .illustration-container { text-align: center; margin-bottom: 30px; }
         .sensor-img { max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border: 1px solid #ccc; }
 
-        /* Bố cục lưới thẻ */
         .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; }
 
         .card { 
@@ -65,12 +58,10 @@
         <img src="../Pic/PLC_analog.jpg" alt="Sơ đồ khối FC Scaling PLC Siemens" class="sensor-img">
     </div>
 
-    
-
     <div class="card-grid">
         <div class="card">
-            <h3>1. Tính Scaling từ giá trị Raw (Thô)</h3>
-            <div class="raw-note">Ghi chú: Dãy Raw Siemens chuẩn là 0 đến 27648.</div>
+            <h3>1. Tính Scaled Output từ Raw Input</h3>
+            <div class="raw-note">Ghi chú: Dãy Raw Input Siemens chuẩn là 0 đến 27648.</div>
             
             <label>Chọn loại tín hiệu:</label>
             <select id="type1">
@@ -81,15 +72,15 @@
 
             <label>Điểm Zero:</label><input type="number" id="z1" placeholder="Ví dụ: 0">
             <label>Điểm Span:</label><input type="number" id="s1" placeholder="Ví dụ: 100">
-            <label>Giá trị Raw thực tế:</label><input type="number" id="r1" placeholder="0 - 27648">
+            <label>Giá trị Raw Input thực tế:</label><input type="number" id="r1" placeholder="0 - 27648">
             
             <button onclick="calcScaling()">TÍNH TOÁN</button>
             <div id="res1" class="result">Kết quả: --</div>
         </div>
 
         <div class="card">
-            <h3>2. Tính Raw (Thô) từ giá trị Scaling</h3>
-            <div class="raw-note">Ghi chú: Dãy Raw Siemens chuẩn là 0 đến 27648.</div>
+            <h3>2. Tính Raw Input từ Scaled Output</h3>
+            <div class="raw-note">Ghi chú: Dãy Raw Input Siemens chuẩn là 0 đến 27648.</div>
 
             <label>Chọn loại tín hiệu:</label>
             <select id="type2">
@@ -100,7 +91,7 @@
 
             <label>Điểm Zero:</label><input type="number" id="z2" placeholder="Ví dụ: 0">
             <label>Điểm Span:</label><input type="number" id="s2" placeholder="Ví dụ: 100">
-            <label>Giá trị Scaling hiện tại:</label><input type="number" id="sc2" placeholder="Nhập giá trị vật lý">
+            <label>Giá trị Scaled Output hiện tại:</label><input type="number" id="sc2" placeholder="Nhập giá trị vật lý">
             
             <button onclick="calcRaw()">TÍNH TOÁN</button>
             <div id="res2" class="result">Kết quả: --</div>
@@ -113,7 +104,6 @@
 </div>
 
 <script>
-    // Hàm cập nhật thời gian chính xác
     function updateClock() {
         const now = new Date();
         const hours = String(now.getHours()).padStart(2, '0');
@@ -146,7 +136,7 @@
         let s = parseFloat(document.getElementById('s1').value);
         let r = parseFloat(document.getElementById('r1').value);
         let res = (r / 27648) * (s - z) + z;
-        document.getElementById('res1').innerHTML = `Tương ứng giá trị Raw quy đổi Scaling là: <b>${res.toFixed(2)}</b>`;
+        document.getElementById('res1').innerHTML = `Giá trị Raw Input quy đổi Scaled Output là: <b>${res.toFixed(2)}</b>`;
     }
 
     function calcRaw() {
@@ -156,7 +146,7 @@
         let sc = parseFloat(document.getElementById('sc2').value);
         if (s === z) { alert("Lỗi: Span và Zero không được bằng nhau!"); return; }
         let res = ((sc - z) / (s - z)) * 27648;
-        document.getElementById('res2').innerHTML = `Tương ứng giá trị Scaling quy đổi Raw là: <b>${res.toFixed(0)}</b>`;
+        document.getElementById('res2').innerHTML = `Giá trị Scaled Output quy đổi Raw Input là: <b>${res.toFixed(0)}</b>`;
     }
 </script>
 
