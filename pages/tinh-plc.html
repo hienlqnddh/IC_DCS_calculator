@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tính PLC Siemens - IC DCS</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        .siemens-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 10px;
+            border-top: 6px solid #006487; /* Màu xanh đặc trưng Siemens */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .header-logo {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .siemens-text { color: #006487; font-weight: bold; font-size: 24px; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-weight: 600; margin-bottom: 5px; color: #333; }
+        input, select { 
+            width: 100%; padding: 12px; border: 1px solid #ced4da; 
+            border-radius: 5px; box-sizing: border-box; font-size: 15px;
+        }
+        button { 
+            background-color: #006487; color: white; border: none; padding: 15px; 
+            border-radius: 5px; cursor: pointer; width: 100%; font-size: 16px; 
+            font-weight: bold; transition: 0.3s;
+        }
+        button:hover { background-color: #004966; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .result-box { 
+            margin-top: 20px; padding: 20px; background: #f1f8fa; 
+            border-radius: 5px; border-left: 6px solid #009999; text-align: center;
+        }
+        #res_val { font-size: 2em; color: #006487; font-weight: bold; }
+        .footer-link { text-align: center; margin-top: 20px; }
+        .footer-link a { color: #666; text-decoration: none; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div class="siemens-container">
+    <div class="header-logo">
+        <span class="siemens-text">SIEMENS</span>
+        <span style="color: #666;">Scale Tool</span>
+    </div>
+
+    <div class="input-group">
+        <label>Chế độ tính toán:</label>
+        <select id="calcMode" onchange="updateUI()">
+            <option value="rtd">Module RTD/TC (Giá trị x10)</option>
+            <option value="analog">Module Analog (0 - 27648)</option>
+        </select>
+    </div>
+
+    <div id="rangeSettings" style="display:none;">
+        <div class="input-group">
+            <label>Dải đo (LRV - URV):</label>
+            <div style="display: flex; gap: 10px;">
+                <input type="number" id="min_range" value="0" placeholder="Min">
+                <input type="number" id="max_range" value="100" placeholder="Max">
+            </div>
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label id="labelRaw">Giá trị Raw (IW/PIW):</label>
+        <input type="number" id="raw_input" placeholder="Nhập số nguyên từ PLC">
+    </div>
+
+    <button onclick="doCalculate()">XỬ LÝ DỮ LIỆU</button>
+
+    <div class="result-box">
+        <div style="color: #555; margin-bottom: 5px;">Giá trị thực tế</div>
+        <div id="res_val">-- °C</div>
+    </div>
+
+    <div class="footer-link">
+        <a href="../index.html">⬅ Quay lại Trang chủ chính</a>
+    </div>
+</div>
+
+<script>
+    function updateUI() {
+        const mode = document.getElementById('calcMode').value;
+        const rangeSet = document.getElementById('rangeSettings');
+        const label = document.getElementById('labelRaw');
+
+        if (mode === 'analog') {
+            rangeSet.style.display = 'block';
+            label.innerText = "Giá trị Raw (0 - 27648):";
+        } else {
+            rangeSet.style.display = 'none';
+            label.innerText = "Giá trị Raw (x10):";
+        }
+    }
+
+    function doCalculate() {
+        const mode = document.getElementById('calcMode').value;
+        const raw = parseFloat(document.getElementById('raw_input').value);
+        let result = 0;
+
+        if (isNaN(raw)) {
+            alert("Bạn chưa nhập giá trị từ PLC!");
+            return;
+        }
+
+        if (mode === 'rtd') {
+            // Chuẩn Siemens RTD: 25.5 độ C gửi về 255
+            result = raw / 10;
+        } else {
+            // Chuẩn Siemens Analog: nội suy trên dải 27648
+            const min = parseFloat(document.getElementById('min_range').value);
+            const max = parseFloat(document.getElementById('max_range').value);
+            result = (raw / 27648) * (max - min) + min;
+        }
+
+        document.getElementById('res_val').innerText = result.toFixed(2) + " °C";
+    }
+</script>
+
+</body>
+</html>
