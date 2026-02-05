@@ -3,83 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tính PLC Áp</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Tính PLC Dòng (4-20mA) - IC DCS</title>
+    <link rel="stylesheet" href="../style.css">
     <style>
-        /* Căn giữa và màu xanh cho tiêu đề các chức năng */
-        .input-group h3 {
-            text-align: center;
-            color: blue;
-            font-weight: bold;
-            margin-top: 0;
-            font-size: 18px;
+        .calc-section {
+            background: #f4f7f6;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
         }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #333; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { 
+            background-color: #007bff; color: white; border: none; padding: 10px 20px; 
+            border-radius: 4px; cursor: pointer; width: 100%; font-size: 16px;
+        }
+        button:hover { background-color: #0056b3; }
+        .result { 
+            margin-top: 15px; padding: 10px; background: #e9ecef; 
+            border-left: 5px solid #28a745; font-weight: bold; 
+        }
+        .formula { font-size: 0.9em; color: #666; font-style: italic; margin-top: 5px; }
     </style>
 </head>
 <body>
-    <h1>CÔNG CỤ HỖ TRỢ TÍNH TOÁN-CHUYỂN ĐỔI THÔNG SỐ DCS</h1>
-    <div id="clock"></div>
-    <div class="container">
-        <h2>TÍNH TOÁN -CHUYỂN ĐỔI THÔNG SỐ CHO MODULE ANALOG PLC (ĐO ÁP)</h2>
-        <p style="text-align: center; font-style: italic;">Áp dụng cho PLC Siemens</p>
-        
-        <div class="input-group">
-            <h3>1. Tính giá trị Scaling của điểm (Raw -> Thực)</h3>
-            <label>Điểm Zero:</label><input type="number" id="z1" placeholder="Ví dụ: 0">
-            <label>Điểm Span:</label><input type="number" id="s1" placeholder="Ví dụ: 100">
-            <label>Giá trị Raw (Thô):</label><input type="number" id="r1" placeholder="Nhập từ 0 đến 27648">
-            <button onclick="calcScale()">Quy đổi Scaling</button>
-            <div id="res1" class="result">Kết quả: ...</div>
-            <div class="tech-note">
-                Được ứng dụng để tính giá trị vật lý thực tế từ giá trị số (Raw) mà module đo áp 0-10V nhận được. Dãy Raw Siemens tiêu chuẩn là 0 - 27648.
+
+<div class="container">
+    <header>
+        <h1>Công cụ Tính PLC Dòng (4-20mA)</h1>
+        <p>Chuyển đổi giữa giá trị dòng điện và giá trị đo (Scaled Value)</p>
+    </header>
+
+    <main>
+        <section class="calc-section">
+            <h3>1. Tính Giá trị đo từ Dòng điện (mA)</h3>
+            <div class="input-group">
+                <label>Dải đo Thấp (Lower Range - LRV):</label>
+                <input type="number" id="lrv" placeholder="Ví dụ: 0" value="0">
             </div>
-        </div>
-
-        <div class="input-group">
-            <h3>2. Quy đổi từ giá trị Scaling sang giá trị Raw (Thực -> Raw)</h3>
-            <label>Điểm Zero:</label><input type="number" id="z2" placeholder="Ví dụ: 0">
-            <label>Điểm Span:</label><input type="number" id="s2" placeholder="Ví dụ: 100">
-            <label>Giá trị Scaling:</label><input type="number" id="v2" placeholder="Nhập giá trị vật lý">
-            <button onclick="calcRaw()">Quy đổi Raw</button>
-            <div id="res2" class="result">Kết quả: ...</div>
-            <div class="tech-note">
-                Được ứng dụng để tìm giá trị Raw tương ứng với giá trị vật lý mong muốn để nạp vào PLC (Dãy Raw từ 0 đến 27648).
+            <div class="input-group">
+                <label>Dải đo Cao (Upper Range - URV):</label>
+                <input type="number" id="urv" placeholder="Ví dụ: 100" value="100">
             </div>
+            <div class="input-group">
+                <label>Dòng điện đo được (mA):</label>
+                <input type="number" id="ma_in" step="0.01" placeholder="Nhập 4-20mA">
+            </div>
+            <button onclick="calculateValue()">Tính Giá Trị</button>
+            <div id="result_value" class="result">Kết quả: --</div>
+        </section>
+
+        <section class="calc-section">
+            <h3>2. Tính Dòng điện (mA) từ Giá trị đo</h3>
+            <div class="input-group">
+                <label>Giá trị thực tế hiện tại:</label>
+                <input type="number" id="val_in" step="0.1" placeholder="Nhập giá trị đo được">
+            </div>
+            <button onclick="calculateMA()">Tính Dòng mA</button>
+            <div id="result_ma" class="result">Kết quả: -- mA</div>
+        </section>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="../index.html" style="text-decoration: none; color: #007bff;">⬅ Quay lại Trang chủ</a>
         </div>
+    </main>
+</div>
 
-        <a href="index.html" class="btn-link btn-back">Quay lại trang chính</a>
-    </div>
+<script>
+    // Công thức: Value = [(mA - 4) / 16] * (URV - LRV) + LRV
+    function calculateValue() {
+        const lrv = parseFloat(document.getElementById('lrv').value);
+        const urv = parseFloat(document.getElementById('urv').value);
+        const ma = parseFloat(document.getElementById('ma_in').value);
 
-    <script>
-        function updateClock() { 
-            const now = new Date();
-            document.getElementById('clock').innerText = "Thời gian thực: " + now.toLocaleString('vi-VN'); 
-        }
-        setInterval(updateClock, 1000); 
-        updateClock();
-
-        function calcScale() {
-            let zero = parseFloat(document.getElementById('z1').value);
-            let span = parseFloat(document.getElementById('s1').value);
-            let raw = parseFloat(document.getElementById('r1').value);
-            
-            if (isNaN(zero) || isNaN(span) || isNaN(raw)) { alert("Vui lòng nhập đủ thông số"); return; }
-
-            let res = (raw / 27648) * (span - zero) + zero;
-            document.getElementById('res1').innerHTML = `Tương ứng Giá trị Raw (Thô) quy đổi Scaling là: <b>${res.toFixed(2)}</b>`;
+        if (isNaN(ma)) {
+            alert("Vui lòng nhập giá trị mA");
+            return;
         }
 
-        function calcRaw() {
-            let zero = parseFloat(document.getElementById('z2').value);
-            let span = parseFloat(document.getElementById('s2').value);
-            let val = parseFloat(document.getElementById('v2').value);
-            
-            if (isNaN(zero) || isNaN(span) || isNaN(val)) { alert("Vui lòng nhập đủ thông số"); return; }
-            if (span === zero) { alert("Span và Zero không được bằng nhau"); return; }
+        const result = ((ma - 4) / 16) * (urv - lrv) + lrv;
+        document.getElementById('result_value').innerText = "Kết quả: " + result.toFixed(3);
+    }
 
-            let res = ((val - zero) / (span - zero)) * 27648;
-            document.getElementById('res2').innerHTML = `Tương ứng Giá trị Scaling quy đổi Giá trị Raw (Thô) là: <b>${Math.round(res)}</b> <br> (Dãy Giá trị Raw của module là từ 0 đến 27648)`;
+    // Công thức: mA = [(Value - LRV) / (URV - LRV)] * 16 + 4
+    function calculateMA() {
+        const lrv = parseFloat(document.getElementById('lrv').value);
+        const urv = parseFloat(document.getElementById('urv').value);
+        const val = parseFloat(document.getElementById('val_in').value);
+
+        if (isNaN(val)) {
+            alert("Vui lòng nhập giá trị đo");
+            return;
         }
-    </script>
+
+        const result = ((val - lrv) / (urv - lrv)) * 16 + 4;
+        document.getElementById('result_ma').innerText = "Kết quả: " + result.toFixed(3) + " mA";
+    }
+</script>
+
 </body>
 </html>
